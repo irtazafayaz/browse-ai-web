@@ -9,8 +9,7 @@ import {
 import ChatPanel from '@/components/ChatPanel';
 import MasonryGrid from '@/components/MasonryGrid';
 import { ChatMessage, FilterChip, Product } from '@/lib/types';
-import { mockProducts, searchProducts } from '@/lib/mockData';
-import { sendMessage } from '@/lib/aiService';
+import { getProducts, searchProducts as apiSearch, toggleBookmark } from '@/lib/api';
 
 /* ══════════════════════════════════════
    Types
@@ -460,15 +459,21 @@ function ResultsContent() {
 
   const [layout, setLayout] = useState<LayoutMode>('sidebar');
   const [sort, setSort] = useState<SortMode>('match');
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [filters, setFilters] = useState<FilterChip[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const initialised = useRef(false);
+  const lastQuery = useRef(initialQuery);
 
   useEffect(() => {
-    if (!initialQuery || initialised.current) return;
+    if (initialised.current) return;
     initialised.current = true;
+
+    if (!initialQuery) {
+      getProducts().then(setProducts).catch(() => {});
+      return;
+    }
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -479,7 +484,7 @@ function ResultsContent() {
     setMessages([userMsg]);
     setIsTyping(true);
 
-    sendMessage([], initialQuery).then(response => {
+    apiSearch(initialQuery, []).then(response => {
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
@@ -487,19 +492,16 @@ function ResultsContent() {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, aiMsg]);
-
+      setProducts(response.products);
       if (response.suggestedFilters.length > 0) {
-        const newFilters = response.suggestedFilters.map(f => ({ id: f, label: f, isSelected: true }));
-        setFilters(newFilters);
-        setProducts(searchProducts(mockProducts, response.suggestedFilters));
-      } else {
-        setProducts(searchProducts(mockProducts, initialQuery.toLowerCase().split(/\s+/)));
+        setFilters(response.suggestedFilters.map((f: string) => ({ id: f, label: f, isSelected: true })));
       }
       setIsTyping(false);
-    });
+    }).catch(() => setIsTyping(false));
   }, [initialQuery]);
 
   const handleSend = useCallback(async (text: string) => {
+    lastQuery.current = text;
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       sender: 'user',
@@ -509,7 +511,7 @@ function ResultsContent() {
     setMessages(prev => {
       const history = [...prev, userMsg];
       setIsTyping(true);
-      sendMessage(history, text).then(response => {
+      apiSearch(text, history.map(m => ({ sender: m.sender, text: m.text }))).then(response => {
         const aiMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
@@ -517,13 +519,12 @@ function ResultsContent() {
           timestamp: new Date(),
         };
         setMessages(h => [...h, aiMsg]);
+        setProducts(response.products);
         if (response.suggestedFilters.length > 0) {
-          const newFilters = response.suggestedFilters.map(f => ({ id: f, label: f, isSelected: true }));
-          setFilters(newFilters);
-          setProducts(searchProducts(mockProducts, response.suggestedFilters));
+          setFilters(response.suggestedFilters.map((f: string) => ({ id: f, label: f, isSelected: true })));
         }
         setIsTyping(false);
-      });
+      }).catch(() => setIsTyping(false));
       return history;
     });
   }, []);
@@ -531,13 +532,24 @@ function ResultsContent() {
   const handleToggleFilter = useCallback((id: string) => {
     setFilters(prev => {
       const updated = prev.map(f => f.id === id ? { ...f, isSelected: !f.isSelected } : f);
-      setProducts(searchProducts(mockProducts, updated.filter(f => f.isSelected).map(f => f.id)));
+      const activeLabels = updated.filter(f => f.isSelected).map(f => f.label);
+      const query = activeLabels.length > 0 ? activeLabels.join(' ') : (lastQuery.current || initialQuery);
+      if (query) {
+        apiSearch(query, []).then(r => setProducts(r.products)).catch(() => {});
+      } else {
+        getProducts().then(setProducts).catch(() => {});
+      }
       return updated;
     });
-  }, []);
+  }, [initialQuery]);
 
   const handleBookmark = useCallback((id: string) => {
+    // Optimistic toggle, then sync with backend
     setProducts(prev => prev.map(p => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p));
+    toggleBookmark(id).catch(() => {
+      // Revert on failure
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p));
+    });
   }, []);
 
   const handleMoreLikeThis = useCallback((product: Product) => {

@@ -7,7 +7,7 @@ import {
   Share2, ShoppingBag, ChevronRight, ArrowUpRight,
   Minus, Plus,
 } from 'lucide-react';
-import { mockProducts } from '@/lib/mockData';
+import { getProduct, getProducts, toggleBookmark } from '@/lib/api';
 import { Product } from '@/lib/types';
 
 /* ── Size selector ── */
@@ -82,9 +82,11 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const id = params.id as string;
 
-  const product = mockProducts.find(p => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [bookmarked, setBookmarked] = useState(product?.isBookmarked ?? false);
+  const [bookmarked, setBookmarked] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToBag, setAddedToBag] = useState(false);
@@ -94,13 +96,31 @@ export default function ProductDetailPage() {
   const actions = useReveal(240);
   const related = useReveal(360);
 
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      getProduct(id),
+      getProducts(),
+    ]).then(([prod, all]) => {
+      setProduct(prod);
+      setBookmarked(prod?.isBookmarked ?? false);
+      const rel = (all as Product[])
+        .filter((p: Product) => p.id !== id && p.tags.some((t: string) => prod?.tags?.includes(t)))
+        .slice(0, 6);
+      setRelatedProducts(rel);
+    }).catch(() => {
+      setProduct(null);
+    }).finally(() => setLoading(false));
+  }, [id]);
+
   const discount = product?.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
 
-  const relatedProducts = mockProducts
-    .filter(p => p.id !== id && p.tags.some(t => product?.tags.includes(t)))
-    .slice(0, 6);
+  const handleBookmarkToggle = () => {
+    setBookmarked(v => !v);
+    toggleBookmark(id).catch(() => setBookmarked(v => !v));
+  };
 
   const handleAddToBag = () => {
     if (!selectedSize) return;
@@ -108,15 +128,24 @@ export default function ProductDetailPage() {
     setTimeout(() => setAddedToBag(false), 2200);
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center" style={{ background: '#F2EDE4' }}>
+        <div className="flex gap-2 items-center">
+          {[0, 1, 2].map(i => (
+            <span key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#C4A882', animationDelay: `${i * 150}ms` }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="flex h-screen items-center justify-center" style={{ background: '#F2EDE4' }}>
         <div className="text-center">
           <p className="font-black text-[#1A1A1A] text-lg">Product not found</p>
-          <button
-            onClick={() => router.back()}
-            className="mt-4 text-sm text-[#8B7355] underline"
-          >
+          <button onClick={() => router.back()} className="mt-4 text-sm text-[#8B7355] underline">
             Go back
           </button>
         </div>
@@ -156,7 +185,7 @@ export default function ProductDetailPage() {
             <Share2 size={14} className="text-[#1A1A1A]" />
           </button>
           <button
-            onClick={() => setBookmarked(v => !v)}
+            onClick={handleBookmarkToggle}
             className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all duration-200"
             style={{
               transform: bookmarked ? 'scale(1.1)' : 'scale(1)',
@@ -404,7 +433,7 @@ export default function ProductDetailPage() {
                 </button>
 
                 <button
-                  onClick={() => setBookmarked(v => !v)}
+                  onClick={handleBookmarkToggle}
                   className="w-full py-3.5 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] hover:bg-[#E8E0D4]"
                   style={{
                     background: 'transparent',

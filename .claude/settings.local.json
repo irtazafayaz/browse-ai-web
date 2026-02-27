@@ -4,7 +4,18 @@
       "Bash(git checkout:*)",
       "Bash(npm run build:*)",
       "Bash(npx next build:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npx tsc:*)",
+      "Bash(/Users/mbp/.bun/bin/bun run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(venv/bin/pip install:*)",
+      "Bash(venv/bin/python:*)",
+      "Bash(venv/bin/pip freeze:*)",
+      "Bash(git init:*)",
+      "Bash(/Users/mbp/Documents/Practice/browse-ai-backend/venv/bin/python:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)"
     ]
   }
 }

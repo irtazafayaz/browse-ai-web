@@ -6,7 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import MarqueeBrands from '@/components/MarqueeBrands';
 import EditCard from '@/components/EditCard';
 import GenderToggle from '@/components/GenderToggle';
-import { curatedEdits } from '@/lib/mockData';
+import { getEdits } from '@/lib/api';
 import { Edit } from '@/lib/types';
 
 /* ══════════════════════════════════════
@@ -148,6 +148,7 @@ const SUGGESTIONS = ['baggy jeans 🛍️', 'maroon pants 🍷', 'wide leg cargo
 export default function LandingPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [edits, setEdits] = useState<Edit[]>([]);
   const statsReveal = useScrollReveal(0.1);
   const featuresReveal = useScrollReveal(0.08);
   const editsReveal = useScrollReveal(0.04);
@@ -156,6 +157,8 @@ export default function LandingPage() {
     const t = setTimeout(() => setMounted(true), 80);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => { getEdits().then(setEdits).catch(() => {}); }, []);
 
   const handleSearch = (text: string) => router.push(`/results?q=${encodeURIComponent(text)}`);
   const handleEditTap = (edit: Edit) => router.push(`/results?q=${encodeURIComponent(edit.label)}`);
@@ -342,7 +345,7 @@ export default function LandingPage() {
 
           {/* Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {curatedEdits.map((edit, i) => (
+            {edits.map((edit, i) => (
               <div
                 key={edit.label}
                 className="transition-all duration-700"

@@ -1,6 +1,10 @@
-import { brands } from '@/lib/mockData';
+'use client';
+import { useState, useEffect } from 'react';
+import { getBrands } from '@/lib/api';
 
 export default function MarqueeBrands({ dark = false }: { dark?: boolean }) {
+  const [brands, setBrands] = useState<string[]>([]);
+  useEffect(() => { getBrands().then(setBrands).catch(() => {}); }, []);
   const doubled = [...brands, ...brands];
   return (
     <div className="overflow-hidden w-full">

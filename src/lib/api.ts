@@ -156,3 +156,21 @@ export async function getBookmarks() {
   if (!res.ok) throw new Error('Failed to fetch bookmarks');
   return res.json();
 }
+
+export async function getBrands(): Promise<string[]> {
+  const res = await apiFetch('/api/products/brands/');
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function getEdits(): Promise<{ label: string; imageUrl: string; tag: string }[]> {
+  const res = await apiFetch('/api/products/edits/');
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function getPrompts(): Promise<string[]> {
+  const res = await apiFetch('/api/products/prompts/');
+  if (!res.ok) return [];
+  return res.json();
+}

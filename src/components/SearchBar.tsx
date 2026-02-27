@@ -1,14 +1,12 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Search, ArrowRight, Edit3 } from 'lucide-react';
+import { getPrompts } from '@/lib/api';
 
-const PROMPTS = [
+const DEFAULT_PROMPTS = [
   'baggy linen pants in earthy tones...',
   'something maroon and wide leg...',
   'cargo pants with a relaxed fit...',
-  'straight leg jeans, classic blue...',
-  'elevated basics under $100...',
-  'oversized and effortless...',
 ];
 
 interface Props {
@@ -19,21 +17,24 @@ interface Props {
 export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
+  const [prompts, setPrompts] = useState<string[]>(DEFAULT_PROMPTS);
   const [promptIndex, setPromptIndex] = useState(0);
   const [promptVisible, setPromptVisible] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { getPrompts().then(p => { if (p.length > 0) setPrompts(p); }).catch(() => {}); }, []);
 
   useEffect(() => {
     const interval = setInterval(async () => {
       if (focused || value) return;
       setPromptVisible(false);
       await new Promise(r => setTimeout(r, 380));
-      setPromptIndex(i => (i + 1) % PROMPTS.length);
+      setPromptIndex(i => (i + 1) % prompts.length);
       setPromptVisible(true);
     }, 3000);
     return () => clearInterval(interval);
-  }, [focused, value]);
+  }, [focused, value, prompts.length]);
 
   const handleSubmit = () => {
     if (!value.trim()) return;
@@ -81,7 +82,7 @@ export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
                 transition: 'opacity 0.35s ease, transform 0.35s ease',
               }}
             >
-              {PROMPTS[promptIndex]}
+              {prompts[promptIndex]}
             </span>
           )}
           <input
