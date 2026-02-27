@@ -1,14 +1,7 @@
 import { AiResponse, ChatMessage } from './types';
+import { searchProducts as backendSearch } from './api';
 
-const SYSTEM_PROMPT = `You are a helpful fashion shopping assistant. Help users find clothing they'll love.
-When responding:
-1. Be friendly and conversational (2-3 sentences max).
-2. At the END of every response, append a JSON block (no markdown) like:
-{"filters": ["keyword1", "keyword2"]}
-The filters should be lowercase style/color/fit keywords extracted from the conversation.
-Example filters: wide leg, straight leg, relaxed fit, baggy, maroon, burgundy, blue, black, cargo, denim, high rise, flared
-Only include filters relevant to what the user wants.`;
-
+// ── Fallback mock (used when backend is unreachable) ───────────────────
 function mockResponse(userMessage: string): AiResponse {
   const lower = userMessage.toLowerCase();
   if (lower.includes('baggy') || lower.includes('wide') || lower.includes('loose'))
@@ -25,38 +18,18 @@ function mockResponse(userMessage: string): AiResponse {
 }
 
 export async function sendMessage(history: ChatMessage[], userMessage: string): Promise<AiResponse> {
-  // If API key is set, use Claude; otherwise mock
-  const apiKey = process.env.NEXT_PUBLIC_CLAUDE_API_KEY;
-  if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
-    await new Promise(r => setTimeout(r, 900));
+  // Try Django backend first; fall back to mock if unreachable
+  try {
+    const historyPayload = history.map(m => ({ sender: m.sender, text: m.text }));
+    const data = await backendSearch(userMessage, historyPayload);
+    return {
+      displayText: data.displayText,
+      suggestedFilters: data.suggestedFilters ?? [],
+    };
+  } catch {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+    console.warn(`[Browse AI] Backend at ${apiUrl} unreachable, using mock response.`);
+    await new Promise(r => setTimeout(r, 800));
     return mockResponse(userMessage);
   }
-
-  const messages = [
-    ...history.map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
-    { role: 'user', content: userMessage },
-  ];
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({ model: 'claude-opus-4-6', max_tokens: 512, system: SYSTEM_PROMPT, messages }),
-  });
-
-  if (!res.ok) throw new Error(`API error ${res.status}`);
-  const json = await res.json();
-  const rawText: string = json.content[0].text;
-
-  const jsonMatch = rawText.match(/\{[\s\S]*"filters"[\s\S]*\}/);
-  let filters: string[] = [];
-  let displayText = rawText.trim();
-  if (jsonMatch) {
-    displayText = rawText.substring(0, jsonMatch.index).trim();
-    try { filters = JSON.parse(jsonMatch[0]).filters ?? []; } catch { /* ignore */ }
-  }
-  return { displayText, suggestedFilters: filters };
 }
