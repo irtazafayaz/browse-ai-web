@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
 import {
   ArrowLeft, BookmarkCheck, PanelLeft, LayoutGrid,
   MessageCircle, X, Sparkles, SlidersHorizontal,
+  ArrowUpDown, TrendingUp, DollarSign, Star,
 } from 'lucide-react';
 import ChatPanel from '@/components/ChatPanel';
-import ProductCard from '@/components/ProductCard';
+import MasonryGrid from '@/components/MasonryGrid';
 import { ChatMessage, FilterChip, Product } from '@/lib/types';
 import { mockProducts, searchProducts } from '@/lib/mockData';
 import { sendMessage } from '@/lib/aiService';
@@ -15,6 +16,7 @@ import { sendMessage } from '@/lib/aiService';
    Types
 ══════════════════════════════════════ */
 type LayoutMode = 'sidebar' | 'dialog';
+type SortMode = 'match' | 'price-asc' | 'price-desc' | 'trending';
 
 /* ══════════════════════════════════════
    Shared sub-components
@@ -24,8 +26,8 @@ function BookmarksPill({ count }: { count: number }) {
   if (count === 0) return null;
   return (
     <div
-      className="flex items-center gap-1.5 bg-[#1A1A1A] text-white text-xs font-semibold rounded-full px-3 py-1.5 animate-scale-in"
-      style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.22)' }}
+      className="flex items-center gap-1.5 text-white text-xs font-semibold rounded-full px-3 py-1.5 animate-scale-in"
+      style={{ background: '#1A1A1A', boxShadow: '0 4px 12px rgba(0,0,0,0.22)' }}
     >
       <BookmarkCheck size={12} />
       {count} saved
@@ -36,7 +38,7 @@ function BookmarksPill({ count }: { count: number }) {
 /* 2-option layout toggle */
 function LayoutToggle({ current, onChange }: { current: LayoutMode; onChange: (m: LayoutMode) => void }) {
   return (
-    <div className="flex items-center gap-0.5 bg-[#F0EDE8] rounded-full p-1 border border-[#E0DDD6]">
+    <div className="flex items-center gap-0.5 rounded-full p-1" style={{ background: '#EDE9E1', border: '1px solid #DDD9D0' }}>
       <button
         onClick={() => onChange('sidebar')}
         title="Sidebar layout"
@@ -63,17 +65,74 @@ function LayoutToggle({ current, onChange }: { current: LayoutMode; onChange: (m
   );
 }
 
-/* Filter chips row */
-function FilterRow({ filters, onToggle }: { filters: FilterChip[]; onToggle: (id: string) => void }) {
-  if (!filters.some(f => f.isSelected)) return null;
+/* Sort chip row */
+const SORT_OPTIONS: { id: SortMode; label: string; icon: React.ReactNode }[] = [
+  { id: 'match',      label: 'Best match',   icon: <Star size={10} /> },
+  { id: 'trending',   label: 'Trending',     icon: <TrendingUp size={10} /> },
+  { id: 'price-asc',  label: 'Price ↑',      icon: <DollarSign size={10} /> },
+  { id: 'price-desc', label: 'Price ↓',      icon: <DollarSign size={10} /> },
+];
+
+function SortBar({
+  sort, onSort, count, query,
+}: {
+  sort: SortMode;
+  onSort: (s: SortMode) => void;
+  count: number;
+  query: string;
+}) {
   return (
-    <div className="flex gap-1.5 flex-wrap">
-      {filters.filter(f => f.isSelected).map(f => (
+    <div className="flex items-center gap-3 animate-fade-slide-up" style={{ animationDuration: '0.5s' }}>
+      {/* Result count + query */}
+      <div className="flex-1 min-w-0">
+        {query && (
+          <h1
+            className="font-black text-[#1A1A1A] text-lg tracking-tight truncate"
+            style={{ letterSpacing: '-0.03em' }}
+          >
+            &ldquo;{query}&rdquo;
+          </h1>
+        )}
+        <p className="text-xs text-[#9B9B9B] mt-0.5 font-medium">
+          {count} {count === 1 ? 'result' : 'results'}
+        </p>
+      </div>
+
+      {/* Sort chips */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <ArrowUpDown size={11} className="text-[#AAAAAA]" />
+        {SORT_OPTIONS.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => onSort(opt.id)}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition-all duration-200 active:scale-95"
+            style={{
+              background: sort === opt.id ? '#1A1A1A' : '#EDE9E1',
+              color: sort === opt.id ? 'white' : '#6B6B6B',
+              border: sort === opt.id ? '1px solid #1A1A1A' : '1px solid transparent',
+            }}
+          >
+            {opt.icon}
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* Active filter chips */
+function FilterRow({ filters, onToggle }: { filters: FilterChip[]; onToggle: (id: string) => void }) {
+  const active = filters.filter(f => f.isSelected);
+  if (active.length === 0) return null;
+  return (
+    <div className="flex gap-1.5 flex-wrap animate-fade-in">
+      {active.map(f => (
         <button
           key={f.id}
           onClick={() => onToggle(f.id)}
-          className="px-2.5 py-1 bg-[#1A1A1A] text-white text-[11px] font-semibold rounded-full flex items-center gap-1 transition-all duration-200 hover:bg-[#333] active:scale-95"
-          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
+          className="px-2.5 py-1 text-white text-[11px] font-semibold rounded-full flex items-center gap-1 transition-all duration-200 hover:opacity-80 active:scale-95"
+          style={{ background: '#1A1A1A', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
         >
           {f.label}
           <X size={9} className="opacity-60" />
@@ -83,97 +142,135 @@ function FilterRow({ filters, onToggle }: { filters: FilterChip[]; onToggle: (id
   );
 }
 
-/* Product grid */
-function ProductGrid({ products, onBookmark, onMoreLikeThis, cols = 'default' }: {
+/* Sort helper */
+function sortProducts(products: Product[], sort: SortMode): Product[] {
+  const arr = [...products];
+  switch (sort) {
+    case 'price-asc':  return arr.sort((a, b) => a.price - b.price);
+    case 'price-desc': return arr.sort((a, b) => b.price - a.price);
+    case 'trending':   return arr.sort((a, b) => b.id.localeCompare(a.id)); // newest IDs
+    default:           return arr; // 'match' — keep server order
+  }
+}
+
+/* ══════════════════════════════════════
+   Shared props type
+══════════════════════════════════════ */
+interface SharedLayoutProps {
   products: Product[];
+  messages: ChatMessage[];
+  filters: FilterChip[];
+  isTyping: boolean;
+  initialQuery: string;
+  sort: SortMode;
+  bookmarkCount: number;
   onBookmark: (id: string) => void;
   onMoreLikeThis: (p: Product) => void;
-  cols?: 'default' | 'wide';
+  onSend: (text: string) => void;
+  onToggleFilter: (id: string) => void;
+  onSortChange: (s: SortMode) => void;
+  onBack: () => void;
+  layoutNode: React.ReactNode;
+}
+
+/* Shared top bar */
+function TopBar({
+  onBack, bookmarkCount, layoutNode, chatToggle, chatDot,
+}: {
+  onBack: () => void;
+  bookmarkCount: number;
+  layoutNode: React.ReactNode;
+  chatToggle?: React.ReactNode;
+  chatDot?: boolean;
 }) {
-  const gridClass = cols === 'wide'
-    ? 'grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3'
-    : 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3';
-
-  if (products.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center gap-3 animate-fade-in">
-        <span className="text-5xl">🔍</span>
-        <p className="font-semibold text-[#1A1A1A]">No results yet</p>
-        <p className="text-sm text-[#6B6B6B]">Try describing what you&apos;re looking for</p>
-      </div>
-    );
-  }
-
   return (
-    <div className={gridClass}>
-      {products.map((p, i) => (
-        <div
-          key={p.id}
-          className="animate-fade-slide-up"
-          style={{ animationDelay: `${Math.min(i * 40, 320)}ms` }}
+    <header
+      className="shrink-0 flex items-center justify-between px-4 py-3 z-20 animate-fade-in"
+      style={{
+        background: 'rgba(242,237,228,0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderBottom: '1px solid rgba(212,196,168,0.35)',
+        boxShadow: '0 1px 0 rgba(212,196,168,0.3)',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onBack}
+          className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[#E8E0D4] active:scale-90"
         >
-          <ProductCard product={p} onBookmark={onBookmark} onMoreLikeThis={onMoreLikeThis} />
+          <ArrowLeft size={16} className="text-[#1A1A1A]" />
+        </button>
+        <div className="flex items-center gap-2 cursor-default">
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ background: '#1A1A1A' }}
+          >
+            <span className="text-white text-[9px] font-black tracking-wider">B</span>
+          </div>
+          <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.02em' }}>
+            Browse AI
+          </span>
         </div>
-      ))}
-    </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <BookmarksPill count={bookmarkCount} />
+        {layoutNode}
+        {chatToggle}
+      </div>
+    </header>
   );
+}
+
+/* Product grid wrapper */
+function ProductGrid({ products, sort, onBookmark, onMoreLikeThis }: {
+  products: Product[];
+  sort: SortMode;
+  onBookmark: (id: string) => void;
+  onMoreLikeThis: (p: Product) => void;
+}) {
+  const sorted = sortProducts(products, sort);
+  return <MasonryGrid products={sorted} onBookmark={onBookmark} onMoreLikeThis={onMoreLikeThis} />;
 }
 
 /* ══════════════════════════════════════
    Layout A — Classic left sidebar
-   (the original design)
 ══════════════════════════════════════ */
 function LayoutSidebar({
   products, messages, filters, isTyping, initialQuery,
-  bookmarkCount, onBookmark, onMoreLikeThis, onSend, onToggleFilter, onBack, layoutNode,
+  sort, bookmarkCount, onBookmark, onMoreLikeThis,
+  onSend, onToggleFilter, onSortChange, onBack, layoutNode,
 }: SharedLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen bg-[#F7F5F0] overflow-hidden">
-      {/* Top bar */}
-      <header
-        className="shrink-0 flex items-center justify-between px-4 py-3 bg-white/90 border-b border-[#E0DDD6] z-20 animate-fade-in"
-        style={{ backdropFilter: 'blur(12px)', boxShadow: '0 1px 12px rgba(0,0,0,0.06)' }}
-      >
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[#F0EDE8] active:scale-90"
-          >
-            <ArrowLeft size={16} className="text-[#1A1A1A]" />
-          </button>
-          <div className="flex items-center gap-2 group cursor-default">
-            <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-              <span className="text-white text-[9px] font-bold">B</span>
-            </div>
-            <span className="font-bold text-[#1A1A1A] text-sm tracking-tight">Browse AI</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <BookmarksPill count={bookmarkCount} />
-          {layoutNode}
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#F2EDE4' }}>
+      <TopBar
+        onBack={onBack}
+        bookmarkCount={bookmarkCount}
+        layoutNode={layoutNode}
+        chatToggle={
           <button
             onClick={() => setChatOpen(v => !v)}
-            className="lg:hidden w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[#F0EDE8] active:scale-90 relative"
+            className="lg:hidden w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[#E8E0D4] active:scale-90 relative"
           >
             <SlidersHorizontal size={15} className="text-[#1A1A1A]" />
             {messages.length > 0 && (
-              <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-[#1A1A1A] rounded-full animate-pulse" />
+              <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-[#C4A882] rounded-full animate-pulse" />
             )}
           </button>
-        </div>
-      </header>
+        }
+      />
 
-      {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left chat sidebar */}
         <aside
-          className={`shrink-0 border-r border-[#E0DDD6] bg-white transition-all duration-300
+          className={`shrink-0 border-r transition-all duration-300
             lg:relative lg:w-[320px] lg:translate-x-0 lg:z-auto lg:opacity-100
             fixed inset-y-0 left-0 w-[300px] z-30
             ${chatOpen ? 'translate-x-0 shadow-2xl opacity-100' : '-translate-x-full opacity-0 lg:opacity-100'}
           `}
+          style={{ background: '#F2EDE4', borderColor: 'rgba(212,196,168,0.4)' }}
         >
           <ChatPanel
             messages={messages}
@@ -193,17 +290,26 @@ function LayoutSidebar({
         )}
 
         {/* Product grid */}
-        <main className="flex-1 overflow-y-auto p-4">
-          <div className="flex items-center justify-between mb-5 animate-fade-slide-up" style={{ animationDuration: '0.5s' }}>
-            <div>
-              <h1 className="font-bold text-[#1A1A1A] text-lg tracking-tight">
-                {initialQuery ? `"${initialQuery}"` : 'All Products'}
-              </h1>
-              <p className="text-xs text-[#8B8B8B] mt-0.5">{products.length} results</p>
-            </div>
-            <FilterRow filters={filters} onToggle={onToggleFilter} />
+        <main className="flex-1 overflow-y-auto" style={{ padding: '20px 16px 40px' }}>
+          <div className="mb-5">
+            <SortBar
+              sort={sort}
+              onSort={onSortChange}
+              count={products.length}
+              query={initialQuery}
+            />
+            {filters.some(f => f.isSelected) && (
+              <div className="mt-3">
+                <FilterRow filters={filters} onToggle={onToggleFilter} />
+              </div>
+            )}
           </div>
-          <ProductGrid products={products} onBookmark={onBookmark} onMoreLikeThis={onMoreLikeThis} />
+          <ProductGrid
+            products={products}
+            sort={sort}
+            onBookmark={onBookmark}
+            onMoreLikeThis={onMoreLikeThis}
+          />
         </main>
       </div>
     </div>
@@ -211,36 +317,42 @@ function LayoutSidebar({
 }
 
 /* ══════════════════════════════════════
-   Layout B — Top filter bar + dialog chat
-   Full-width grid, chat opens as a centered dialog
+   Layout B — Full grid + dialog chat
 ══════════════════════════════════════ */
 function LayoutDialog({
   products, messages, filters, isTyping, initialQuery,
-  bookmarkCount, onBookmark, onMoreLikeThis, onSend, onToggleFilter, onBack, layoutNode,
+  sort, bookmarkCount, onBookmark, onMoreLikeThis,
+  onSend, onToggleFilter, onSortChange, onBack, layoutNode,
 }: SharedLayoutProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen bg-[#F7F5F0]">
-      {/* Top bar — two rows */}
+    <div className="flex flex-col h-screen" style={{ background: '#F2EDE4' }}>
+      {/* Top bar */}
       <header
-        className="shrink-0 px-5 bg-white/90 border-b border-[#E0DDD6] z-20 animate-fade-in"
-        style={{ backdropFilter: 'blur(12px)', boxShadow: '0 1px 12px rgba(0,0,0,0.06)' }}
+        className="shrink-0 px-5 z-20 animate-fade-in"
+        style={{
+          background: 'rgba(242,237,228,0.94)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          borderBottom: '1px solid rgba(212,196,168,0.35)',
+          boxShadow: '0 1px 0 rgba(212,196,168,0.3)',
+        }}
       >
         {/* Row 1: nav */}
         <div className="flex items-center justify-between py-3">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F0EDE8] active:scale-90 transition-all duration-200"
+              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all duration-200"
             >
               <ArrowLeft size={16} className="text-[#1A1A1A]" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center">
-                <span className="text-white text-[9px] font-bold">B</span>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#1A1A1A' }}>
+                <span className="text-white text-[9px] font-black">B</span>
               </div>
-              <span className="font-bold text-[#1A1A1A] text-sm tracking-tight">Browse AI</span>
+              <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -253,8 +365,8 @@ function LayoutDialog({
         <div className="flex items-center gap-2 overflow-x-auto chat-scroll pb-3">
           {initialQuery && (
             <span
-              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#1A1A1A] text-white"
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
+              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full text-white"
+              style={{ background: '#1A1A1A', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
             >
               <Sparkles size={10} />
               {initialQuery}
@@ -263,7 +375,19 @@ function LayoutDialog({
           <FilterRow filters={filters} onToggle={onToggleFilter} />
           <button
             onClick={() => setDialogOpen(true)}
-            className="shrink-0 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-dashed border-[#C0BDB6] text-[#8B8B8B] hover:border-[#1A1A1A] hover:text-[#1A1A1A] transition-all duration-200 ml-auto"
+            className="shrink-0 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-dashed transition-all duration-200 ml-auto"
+            style={{
+              borderColor: '#C0BDB6',
+              color: '#8B8B8B',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = '#1A1A1A';
+              (e.currentTarget as HTMLButtonElement).style.color = '#1A1A1A';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = '#C0BDB6';
+              (e.currentTarget as HTMLButtonElement).style.color = '#8B8B8B';
+            }}
           >
             <MessageCircle size={11} />
             Refine with AI
@@ -272,43 +396,42 @@ function LayoutDialog({
       </header>
 
       {/* Full-width grid */}
-      <main className="flex-1 overflow-y-auto p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-[#8B8B8B] font-medium">
-            {products.length} results · sorted by match
-          </p>
-          <button
-            onClick={() => setDialogOpen(true)}
-            className="flex items-center gap-1.5 text-xs text-[#8B7355] font-semibold hover:underline transition-all"
-          >
-            <Sparkles size={11} />
-            Ask AI
-          </button>
+      <main className="flex-1 overflow-y-auto" style={{ padding: '20px 20px 60px' }}>
+        <div className="mb-5">
+          <SortBar
+            sort={sort}
+            onSort={onSortChange}
+            count={products.length}
+            query=""
+          />
         </div>
-        <ProductGrid products={products} onBookmark={onBookmark} onMoreLikeThis={onMoreLikeThis} cols="wide" />
+        <ProductGrid
+          products={products}
+          sort={sort}
+          onBookmark={onBookmark}
+          onMoreLikeThis={onMoreLikeThis}
+        />
       </main>
 
       {/* Chat dialog */}
       {dialogOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setDialogOpen(false)}
           />
-          {/* Dialog panel */}
           <div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg rounded-3xl overflow-hidden animate-fade-slide-up"
             style={{
               height: 480,
-              boxShadow: '0 32px 80px rgba(0,0,0,0.24), 0 8px 24px rgba(0,0,0,0.10)',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.12)',
             }}
           >
-            {/* Close button */}
             <div className="absolute top-3 right-3 z-10">
               <button
                 onClick={() => setDialogOpen(false)}
-                className="w-7 h-7 bg-[#F0EDE8] rounded-full flex items-center justify-center hover:bg-[#E0DDD6] transition-colors active:scale-90"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:opacity-80 transition-all active:scale-90"
+                style={{ background: 'rgba(240,237,232,0.95)' }}
               >
                 <X size={13} className="text-[#1A1A1A]" />
               </button>
@@ -328,24 +451,6 @@ function LayoutDialog({
 }
 
 /* ══════════════════════════════════════
-   Shared props type
-══════════════════════════════════════ */
-interface SharedLayoutProps {
-  products: Product[];
-  messages: ChatMessage[];
-  filters: FilterChip[];
-  isTyping: boolean;
-  initialQuery: string;
-  bookmarkCount: number;
-  onBookmark: (id: string) => void;
-  onMoreLikeThis: (p: Product) => void;
-  onSend: (text: string) => void;
-  onToggleFilter: (id: string) => void;
-  onBack: () => void;
-  layoutNode: React.ReactNode;
-}
-
-/* ══════════════════════════════════════
    Main results content
 ══════════════════════════════════════ */
 function ResultsContent() {
@@ -354,13 +459,13 @@ function ResultsContent() {
   const initialQuery = searchParams.get('q') ?? '';
 
   const [layout, setLayout] = useState<LayoutMode>('sidebar');
+  const [sort, setSort] = useState<SortMode>('match');
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [filters, setFilters] = useState<FilterChip[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const initialised = useRef(false);
 
-  /* Bootstrap with initial query */
   useEffect(() => {
     if (!initialQuery || initialised.current) return;
     initialised.current = true;
@@ -440,16 +545,17 @@ function ResultsContent() {
   }, [handleSend]);
 
   const bookmarkCount = products.filter(p => p.isBookmarked).length;
-
   const layoutNode = <LayoutToggle current={layout} onChange={setLayout} />;
 
   const sharedProps: SharedLayoutProps = {
     products, messages, filters, isTyping, initialQuery,
+    sort,
     bookmarkCount,
     onBookmark: handleBookmark,
     onMoreLikeThis: handleMoreLikeThis,
     onSend: handleSend,
     onToggleFilter: handleToggleFilter,
+    onSortChange: setSort,
     onBack: () => router.push('/'),
     layoutNode,
   };
@@ -465,13 +571,13 @@ function ResultsContent() {
 export default function ResultsPage() {
   return (
     <Suspense fallback={
-      <div className="flex h-screen items-center justify-center bg-[#F7F5F0]">
+      <div className="flex h-screen items-center justify-center" style={{ background: '#F2EDE4' }}>
         <div className="flex gap-2 items-center">
           {[0, 1, 2].map(i => (
             <span
               key={i}
-              className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A] animate-bounce"
-              style={{ animationDelay: `${i * 150}ms` }}
+              className="w-2 h-2 rounded-full animate-bounce"
+              style={{ background: '#C4A882', animationDelay: `${i * 150}ms` }}
             />
           ))}
         </div>

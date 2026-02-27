@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Sparkles } from 'lucide-react';
 import { ChatMessage, FilterChip } from '@/lib/types';
 
 interface Props {
@@ -27,29 +27,57 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      {/* Header */}
-      <div className="px-4 py-4 border-b border-[#E0DDD6]">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-[#1A1A1A] flex items-center justify-center">
-            <span className="text-white text-xs font-bold">B</span>
+    <div className="flex flex-col h-full" style={{ background: '#F2EDE4' }}>
+
+      {/* ── Header ── */}
+      <div className="shrink-0 px-5 pt-5 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center">
+              <span className="text-white text-xs font-black tracking-tighter">B</span>
+            </div>
+            <div>
+              <p className="font-black text-[#1A1A1A] text-sm tracking-tight leading-none">Browse AI</p>
+              <p className="text-[10px] text-[#8B7355] font-semibold uppercase tracking-widest leading-none mt-0.5">Stylist</p>
+            </div>
           </div>
-          <span className="font-bold text-[#1A1A1A] text-base tracking-tight">Browse AI</span>
-          {/* Subtle live indicator */}
-          <div className="ml-auto flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] text-[#8B8B8B] font-medium">Live</span>
+          {/* Live dot */}
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] text-[#8B8B8B] font-semibold tracking-widest uppercase">Live</span>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="mt-4 h-px bg-gradient-to-r from-transparent via-[#D4C4A8] to-transparent" />
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto chat-scroll p-4 space-y-3">
+      {/* ── Messages ── */}
+      <div className="flex-1 overflow-y-auto chat-scroll px-4 pb-2 space-y-3">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12 animate-fade-in">
-            <span className="text-4xl">👗</span>
-            <p className="font-semibold text-[#1A1A1A] text-sm">Tell me what you&apos;re looking for</p>
-            <p className="text-[#6B6B6B] text-xs leading-relaxed">Try &quot;baggy jeans&quot;, &quot;maroon pants&quot;,<br />or &quot;wide leg cargo&quot;</p>
+          <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-10 animate-fade-in">
+            <div className="w-14 h-14 rounded-2xl bg-[#1A1A1A] flex items-center justify-center">
+              <Sparkles size={22} className="text-[#C4A882]" />
+            </div>
+            <div>
+              <p className="font-black text-[#1A1A1A] text-sm tracking-tight">Your AI stylist</p>
+              <p className="text-[#8B8B8B] text-xs leading-relaxed mt-1 max-w-[160px] mx-auto">
+                Tell me what you&apos;re looking for in plain English
+              </p>
+            </div>
+            {/* Prompt suggestions */}
+            <div className="flex flex-col gap-2 w-full mt-2">
+              {['"baggy jeans in earthy tones"', '"maroon wide leg under $150"', '"elevated basics, minimal"'].map(s => (
+                <button
+                  key={s}
+                  onClick={() => onSend(s.replace(/"/g, ''))}
+                  className="text-left text-xs text-[#6B6B6B] px-3 py-2 rounded-xl border border-[#E0DDD6] hover:border-[#1A1A1A] hover:text-[#1A1A1A] transition-all duration-200"
+                  style={{ background: 'rgba(255,255,255,0.6)' }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -61,19 +89,23 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
           >
             {msg.sender === 'ai' && (
               <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0">
-                <span className="text-white text-[10px] font-bold">B</span>
+                <span className="text-[#C4A882] text-[9px] font-black">B</span>
               </div>
             )}
             <div
-              className={`max-w-[75%] px-3.5 py-2.5 text-sm leading-relaxed rounded-2xl ${
+              className={`max-w-[78%] px-3.5 py-2.5 text-xs leading-relaxed rounded-2xl font-medium ${
                 msg.sender === 'user'
                   ? 'bg-[#1A1A1A] text-white rounded-br-sm'
-                  : 'bg-[#EEECEA] text-[#1A1A1A] rounded-bl-sm'
+                  : 'text-[#1A1A1A] rounded-bl-sm'
               }`}
               style={{
+                background: msg.sender === 'user'
+                  ? '#1A1A1A'
+                  : 'rgba(255,255,255,0.80)',
                 boxShadow: msg.sender === 'user'
-                  ? '0 4px 12px rgba(26,26,26,0.25)'
-                  : '0 2px 8px rgba(0,0,0,0.06)',
+                  ? '0 4px 14px rgba(26,26,26,0.28)'
+                  : '0 2px 8px rgba(0,0,0,0.07)',
+                backdropFilter: msg.sender === 'ai' ? 'blur(8px)' : undefined,
               }}
             >
               {msg.text}
@@ -81,16 +113,20 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
           </div>
         ))}
 
+        {/* Typing indicator */}
         {isTyping && (
           <div className="flex items-end gap-2 animate-msg-in">
             <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0">
-              <span className="text-white text-[10px] font-bold">B</span>
+              <span className="text-[#C4A882] text-[9px] font-black">B</span>
             </div>
-            <div className="bg-[#EEECEA] rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5 items-center" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <div
+              className="rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5 items-center"
+              style={{ background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(8px)', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}
+            >
               {[0, 1, 2].map(i => (
                 <span
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-[#8B8B8B] animate-bounce"
+                  className="w-1.5 h-1.5 rounded-full bg-[#8B7355] animate-bounce"
                   style={{ animationDelay: `${i * 140}ms` }}
                 />
               ))}
@@ -100,20 +136,20 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
         <div ref={bottomRef} />
       </div>
 
-      {/* Filter chips */}
+      {/* ── Filter chips ── */}
       {filters.length > 0 && (
-        <div className="px-4 py-2 flex gap-2 overflow-x-auto chat-scroll border-t border-[#F0EDE8]">
+        <div className="px-4 py-2.5 flex gap-2 overflow-x-auto chat-scroll">
           {filters.map(chip => (
             <button
               key={chip.id}
               onClick={() => onToggleFilter(chip.id)}
-              className="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200"
+              className="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-200"
               style={{
-                background: chip.isSelected ? '#1A1A1A' : 'white',
+                background: chip.isSelected ? '#1A1A1A' : 'rgba(255,255,255,0.7)',
                 color: chip.isSelected ? 'white' : '#1A1A1A',
-                borderColor: chip.isSelected ? '#1A1A1A' : '#E0DDD6',
-                transform: chip.isSelected ? 'scale(1.02)' : 'scale(1)',
-                boxShadow: chip.isSelected ? '0 4px 10px rgba(0,0,0,0.18)' : 'none',
+                borderColor: chip.isSelected ? '#1A1A1A' : '#D4C4A8',
+                transform: chip.isSelected ? 'scale(1.03)' : 'scale(1)',
+                boxShadow: chip.isSelected ? '0 4px 12px rgba(0,0,0,0.22)' : 'none',
               }}
             >
               {chip.label}
@@ -122,12 +158,19 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
         </div>
       )}
 
-      {/* Input */}
-      <div className="p-3 border-t border-[#E0DDD6]">
+      {/* ── Input ── */}
+      <div className="shrink-0 px-4 pb-4 pt-2">
         <div
-          className="flex items-center gap-2 bg-[#F7F5F0] rounded-full px-4 py-2 transition-all duration-200"
+          className="flex items-center gap-2 rounded-2xl px-4 py-3 transition-all duration-200"
           style={{
-            boxShadow: inputFocused ? '0 0 0 2px rgba(26,26,26,0.15), 0 4px 12px rgba(0,0,0,0.06)' : 'none',
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(12px)',
+            border: inputFocused
+              ? '1.5px solid rgba(26,26,26,0.35)'
+              : '1.5px solid rgba(212,196,168,0.6)',
+            boxShadow: inputFocused
+              ? '0 0 0 3px rgba(26,26,26,0.06), 0 4px 16px rgba(0,0,0,0.08)'
+              : '0 2px 8px rgba(0,0,0,0.06)',
           }}
         >
           <input
@@ -138,24 +181,25 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
             disabled={isTyping}
-            placeholder="Chat to refine..."
-            className="flex-1 bg-transparent outline-none text-sm text-[#1A1A1A] placeholder-[#9B9B9B]"
+            placeholder="Refine your search..."
+            className="flex-1 bg-transparent outline-none text-sm text-[#1A1A1A] placeholder-[#AAAAAA] font-medium"
           />
           <button
             onClick={handleSend}
             disabled={isTyping || !input.trim()}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200"
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0"
             style={{
-              background: input.trim() && !isTyping ? '#1A1A1A' : '#E0DDD6',
-              color: input.trim() && !isTyping ? 'white' : '#9B9B9B',
-              transform: input.trim() && !isTyping ? 'scale(1)' : 'scale(0.92)',
-              boxShadow: input.trim() && !isTyping ? '0 4px 10px rgba(0,0,0,0.2)' : 'none',
+              background: input.trim() && !isTyping ? '#1A1A1A' : 'transparent',
+              color: input.trim() && !isTyping ? 'white' : '#CCCCCC',
+              transform: input.trim() && !isTyping ? 'scale(1)' : 'scale(0.88)',
+              boxShadow: input.trim() && !isTyping ? '0 4px 12px rgba(0,0,0,0.22)' : 'none',
             }}
           >
             <ArrowUp size={14} />
           </button>
         </div>
       </div>
+
     </div>
   );
 }
