@@ -10,6 +10,8 @@ import ChatPanel from '@/components/ChatPanel';
 import MasonryGrid from '@/components/MasonryGrid';
 import { ChatMessage, FilterChip, Product } from '@/lib/types';
 import { getProducts, searchProducts as apiSearch, toggleBookmark } from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
+import AuthModal from '@/components/AuthModal';
 
 /* ══════════════════════════════════════
    Types
@@ -170,17 +172,18 @@ interface SharedLayoutProps {
   onSortChange: (s: SortMode) => void;
   onBack: () => void;
   layoutNode: React.ReactNode;
+  authNode: React.ReactNode;
 }
 
 /* Shared top bar */
 function TopBar({
-  onBack, bookmarkCount, layoutNode, chatToggle, chatDot,
+  onBack, bookmarkCount, layoutNode, chatToggle, authNode,
 }: {
   onBack: () => void;
   bookmarkCount: number;
   layoutNode: React.ReactNode;
   chatToggle?: React.ReactNode;
-  chatDot?: boolean;
+  authNode?: React.ReactNode;
 }) {
   return (
     <header
@@ -216,6 +219,7 @@ function TopBar({
         <BookmarksPill count={bookmarkCount} />
         {layoutNode}
         {chatToggle}
+        {authNode}
       </div>
     </header>
   );
@@ -238,7 +242,7 @@ function ProductGrid({ products, sort, onBookmark, onMoreLikeThis }: {
 function LayoutSidebar({
   products, messages, filters, isTyping, initialQuery,
   sort, bookmarkCount, onBookmark, onMoreLikeThis,
-  onSend, onToggleFilter, onSortChange, onBack, layoutNode,
+  onSend, onToggleFilter, onSortChange, onBack, layoutNode, authNode,
 }: SharedLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -248,6 +252,7 @@ function LayoutSidebar({
         onBack={onBack}
         bookmarkCount={bookmarkCount}
         layoutNode={layoutNode}
+        authNode={authNode}
         chatToggle={
           <button
             onClick={() => setChatOpen(v => !v)}
@@ -321,7 +326,7 @@ function LayoutSidebar({
 function LayoutDialog({
   products, messages, filters, isTyping, initialQuery,
   sort, bookmarkCount, onBookmark, onMoreLikeThis,
-  onSend, onToggleFilter, onSortChange, onBack, layoutNode,
+  onSend, onToggleFilter, onSortChange, onBack, layoutNode, authNode,
 }: SharedLayoutProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -357,6 +362,7 @@ function LayoutDialog({
           <div className="flex items-center gap-2">
             <BookmarksPill count={bookmarkCount} />
             {layoutNode}
+            {authNode}
           </div>
         </div>
 
@@ -456,6 +462,8 @@ function ResultsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
+  const { user } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
 
   const [layout, setLayout] = useState<LayoutMode>('sidebar');
   const [sort, setSort] = useState<SortMode>('match');
@@ -559,6 +567,33 @@ function ResultsContent() {
   const bookmarkCount = products.filter(p => p.isBookmarked).length;
   const layoutNode = <LayoutToggle current={layout} onChange={setLayout} />;
 
+  const authNode = (
+    <>
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      {user ? (
+        <button
+          onClick={() => setAuthOpen(true)}
+          className="w-7 h-7 rounded-full flex items-center justify-center font-black text-white text-[10px] transition-all hover:scale-105 active:scale-95"
+          style={{ background: '#1A1A1A' }}
+          title={user.email}
+        >
+          {user.avatar_url
+            ? <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+            : ([user.first_name, user.last_name].filter(Boolean).map(n => n[0]).join('').toUpperCase() || user.email[0].toUpperCase())
+          }
+        </button>
+      ) : (
+        <button
+          onClick={() => setAuthOpen(true)}
+          className="px-3 py-1.5 text-[10px] font-black tracking-wide uppercase transition-all duration-200 hover:bg-[#1A1A1A] hover:text-white active:scale-95"
+          style={{ border: '1.5px solid #1A1A1A', color: '#1A1A1A', letterSpacing: '0.08em' }}
+        >
+          Sign in
+        </button>
+      )}
+    </>
+  );
+
   const sharedProps: SharedLayoutProps = {
     products, messages, filters, isTyping, initialQuery,
     sort,
@@ -570,6 +605,7 @@ function ResultsContent() {
     onSortChange: setSort,
     onBack: () => router.push('/'),
     layoutNode,
+    authNode,
   };
 
   if (layout === 'sidebar') return <LayoutSidebar {...sharedProps} />;

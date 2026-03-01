@@ -8,6 +8,8 @@ import EditCard from '@/components/EditCard';
 import GenderToggle from '@/components/GenderToggle';
 import { getEdits } from '@/lib/api';
 import { Edit } from '@/lib/types';
+import { useAuth } from '@/lib/AuthContext';
+import AuthModal from '@/components/AuthModal';
 
 /* ══════════════════════════════════════
    Scroll reveal hook
@@ -147,8 +149,10 @@ const SUGGESTIONS = ['baggy jeans 🛍️', 'maroon pants 🍷', 'wide leg cargo
 ══════════════════════════════════════ */
 export default function LandingPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [edits, setEdits] = useState<Edit[]>([]);
+  const [authOpen, setAuthOpen] = useState(false);
   const statsReveal = useScrollReveal(0.1);
   const featuresReveal = useScrollReveal(0.08);
   const editsReveal = useScrollReveal(0.04);
@@ -166,6 +170,7 @@ export default function LandingPage() {
   return (
     <div className="relative bg-[#F2EDE4] overflow-x-hidden">
       <AmbientOrbs />
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       {/* ── NAV ── */}
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-6 max-w-7xl mx-auto">
@@ -179,10 +184,33 @@ export default function LandingPage() {
           <span className="font-black text-[#1A1A1A] text-lg tracking-tight">Browse AI</span>
         </div>
         <div
-          className="flex items-center gap-4 transition-all duration-700"
+          className="flex items-center gap-3 transition-all duration-700"
           style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'translateY(0)' : 'translateY(-12px)', transitionDelay: '80ms' }}
         >
           <GenderToggle />
+          {user ? (
+            /* Avatar button when logged in */
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center font-black text-white text-xs transition-all duration-200 hover:scale-105 active:scale-95"
+              style={{ background: '#1A1A1A' }}
+              title={user.email}
+            >
+              {user.avatar_url
+                ? <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                : ([user.first_name, user.last_name].filter(Boolean).map(n => n[0]).join('').toUpperCase() || user.email[0].toUpperCase())
+              }
+            </button>
+          ) : (
+            /* Sign in button when guest */
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="px-4 py-2 text-[11px] font-black tracking-wide uppercase transition-all duration-200 hover:bg-[#1A1A1A] hover:text-white active:scale-95"
+              style={{ border: '1.5px solid #1A1A1A', color: '#1A1A1A', letterSpacing: '0.08em' }}
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </nav>
 
