@@ -15,7 +15,26 @@
       "Bash(git init:*)",
       "Bash(/Users/mbp/Documents/Practice/browse-ai-backend/venv/bin/python:*)",
       "Bash(curl:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(git remote add:*)",
+      "Bash(grep:*)",
+      "Bash(mongosh:*)",
+      "Bash(mongo --quiet --eval:*)",
+      "Bash(ATLAS_URI=\"mongodb+srv://infobrowseai_db_user:xerN4idlIzE0Sk0I@browseai.fr07ihr.mongodb.net/?appName=BrowseAI\")",
+      "Bash(mongoimport:*)",
+      "Bash(lsof:*)",
+      "Bash(sqlite3:*)",
+      "Bash(python manage.py showmigrations:*)",
+      "Bash(python manage.py migrate:*)",
+      "Bash(source:*)",
+      "Bash(python manage.py check:*)",
+      "Bash(xargs kill -9)",
+      "Bash(pip show:*)",
+      "Bash(pip3 show:*)",
+      "Bash(/opt/anaconda3/bin/pip show:*)",
+      "Bash(/opt/anaconda3/bin/pip3 show:*)",
+      "Bash(/Users/mbp/Documents/Practice/browse-ai-backend/venv/bin/pip show:*)",
+      "Bash(python:*)"
     ]
   }
 }
