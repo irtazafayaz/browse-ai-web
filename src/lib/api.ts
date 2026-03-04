@@ -8,6 +8,8 @@
  * - Auth headers on every request
  */
 
+import { PaginatedProducts } from './types';
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
 // ── Token helpers ──────────────────────────────────────────────────────
@@ -24,6 +26,41 @@ export const tokens = {
   },
 };
 
+// ── Token refresh lock — prevents concurrent refresh races ─────────────
+let _refreshPromise: Promise<boolean> | null = null;
+
+async function refreshTokens(): Promise<boolean> {
+  if (_refreshPromise) return _refreshPromise;
+
+  _refreshPromise = (async () => {
+    const refresh = tokens.refresh;
+    if (!refresh) return false;
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/token/refresh/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh }),
+      });
+      if (!res.ok) { tokens.clear(); return false; }
+      const data = await res.json();
+      if (!data.access) { tokens.clear(); return false; }
+      tokens.set(data.access, data.refresh ?? refresh);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      _refreshPromise = null;
+    }
+  })();
+
+  return _refreshPromise;
+}
+
+// ── Safe JSON parse helper ─────────────────────────────────────────────
+async function safeJson<T>(res: Response): Promise<T | null> {
+  try { return await res.json() as T; } catch { return null; }
+}
+
 // ── Core fetch wrapper ─────────────────────────────────────────────────
 async function apiFetch(path: string, options: RequestInit = {}, retry = true): Promise<Response> {
   const headers: Record<string, string> = {
@@ -37,21 +74,9 @@ async function apiFetch(path: string, options: RequestInit = {}, retry = true): 
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
-  // Auto-refresh on 401
   if (res.status === 401 && retry && tokens.refresh) {
-    const refreshed = await fetch(`${BASE_URL}/api/auth/token/refresh/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh: tokens.refresh }),
-    });
-
-    if (refreshed.ok) {
-      const data = await refreshed.json();
-      tokens.set(data.access, data.refresh ?? tokens.refresh!);
-      return apiFetch(path, options, false); // retry once
-    } else {
-      tokens.clear(); // refresh token expired — force re-login
-    }
+    const refreshed = await refreshTokens();
+    if (refreshed) return apiFetch(path, options, false);
   }
 
   return res;
@@ -64,16 +89,27 @@ export interface AuthResponse {
   user: { id: number; email: string; first_name: string; last_name: string; avatar_url: string };
 }
 
+function parseDrfError(err: unknown, fallback: string): string {
+  if (!err || typeof err !== 'object') return fallback;
+  const e = err as Record<string, unknown>;
+  if (typeof e.detail === 'string') return e.detail;
+  const msgs: string[] = [];
+  for (const val of Object.values(e)) {
+    if (Array.isArray(val)) val.forEach(v => typeof v === 'string' && msgs.push(v));
+    else if (typeof val === 'string') msgs.push(val);
+  }
+  return msgs.length ? msgs.join(' ') : fallback;
+}
+
 export async function register(email: string, password: string, password2: string, firstName = '', lastName = ''): Promise<AuthResponse> {
   const res = await apiFetch('/api/auth/register/', {
     method: 'POST',
     body: JSON.stringify({ email, password, password2, first_name: firstName, last_name: lastName }),
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(JSON.stringify(err));
-  }
-  const data: AuthResponse = await res.json();
+  const body = await safeJson<Record<string, unknown>>(res);
+  if (!res.ok) throw new Error(parseDrfError(body, 'Registration failed.'));
+  const data = body as unknown as AuthResponse;
+  if (!data?.access || !data?.refresh) throw new Error('Invalid response from server.');
   tokens.set(data.access, data.refresh);
   return data;
 }
@@ -83,35 +119,34 @@ export async function login(email: string, password: string): Promise<AuthRespon
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.detail ?? 'Login failed');
-  }
-  const data: AuthResponse = await res.json();
+  const body = await safeJson<Record<string, unknown>>(res);
+  if (!res.ok) throw new Error(parseDrfError(body, 'Login failed. Check your credentials.'));
+  const data = body as unknown as AuthResponse;
+  if (!data?.access || !data?.refresh) throw new Error('Invalid response from server.');
   tokens.set(data.access, data.refresh);
   return data;
 }
 
 export async function logout(): Promise<void> {
-  if (tokens.refresh) {
-    await apiFetch('/api/auth/logout/', {
-      method: 'POST',
-      body: JSON.stringify({ refresh: tokens.refresh }),
-    });
-  }
+  const refresh = tokens.refresh;
   tokens.clear();
+  if (refresh) {
+    apiFetch('/api/auth/logout/', {
+      method: 'POST',
+      body: JSON.stringify({ refresh }),
+    }).catch(() => {});
+  }
 }
 
-export async function googleAuth(idToken: string): Promise<AuthResponse> {
+export async function googleAuth(accessToken: string): Promise<AuthResponse> {
   const res = await apiFetch('/api/auth/google/', {
     method: 'POST',
-    body: JSON.stringify({ id_token: idToken }),
+    body: JSON.stringify({ access_token: accessToken }),
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.detail ?? 'Google auth failed');
-  }
-  const data: AuthResponse = await res.json();
+  const body = await safeJson<Record<string, unknown>>(res);
+  if (!res.ok) throw new Error(parseDrfError(body, 'Google sign-in failed.'));
+  const data = body as unknown as AuthResponse;
+  if (!data?.access || !data?.refresh) throw new Error('Invalid response from server.');
   tokens.set(data.access, data.refresh);
   return data;
 }
@@ -123,9 +158,29 @@ export async function getMe() {
 }
 
 // ── Products ───────────────────────────────────────────────────────────
-export async function getProducts(q?: string) {
-  const url = q ? `/api/products/?q=${encodeURIComponent(q)}` : '/api/products/';
-  const res = await apiFetch(url);
+
+export interface ProductsParams {
+  q?: string;
+  page?: number;
+  page_size?: number;
+  brand?: string;
+  min_price?: number;
+  max_price?: number;
+  tags?: string[];
+}
+
+export async function getProducts(params: ProductsParams = {}): Promise<PaginatedProducts> {
+  const qs = new URLSearchParams();
+  if (params.q)                       qs.set('q',         params.q);
+  if (params.page)                    qs.set('page',      String(params.page));
+  if (params.page_size)               qs.set('page_size', String(params.page_size));
+  if (params.brand)                   qs.set('brand',     params.brand);
+  if (params.min_price != null)       qs.set('min_price', String(params.min_price));
+  if (params.max_price != null)       qs.set('max_price', String(params.max_price));
+  if (params.tags?.length)            qs.set('tags',      params.tags.join(','));
+
+  const query = qs.toString();
+  const res = await apiFetch(`/api/products/${query ? '?' + query : ''}`);
   if (!res.ok) throw new Error('Failed to fetch products');
   return res.json();
 }
@@ -136,12 +191,43 @@ export async function getProduct(id: string) {
   return res.json();
 }
 
-export async function searchProducts(query: string, history: { sender: string; text: string }[]) {
-  const res = await apiFetch('/api/products/search/', {
+/** Image-based product search. Sends a multipart form with an image file. */
+export async function searchByImage(file: File, page = 1): Promise<PaginatedProducts> {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('page', String(page));
+
+  // Don't use apiFetch here — it forces Content-Type: application/json which breaks multipart.
+  // Build auth header manually instead.
+  const headers: Record<string, string> = {};
+  if (tokens.access) headers['Authorization'] = `Bearer ${tokens.access}`;
+
+  const res = await fetch(`${BASE_URL}/api/products/image-search/`, {
     method: 'POST',
-    body: JSON.stringify({ query, history }),
+    headers,
+    body: formData,
   });
-  if (!res.ok) throw new Error('Search failed');
+
+  // Retry once on 401
+  if (res.status === 401 && tokens.refresh) {
+    const refreshed = await refreshTokens();
+    if (refreshed) {
+      const headers2: Record<string, string> = {};
+      if (tokens.access) headers2['Authorization'] = `Bearer ${tokens.access}`;
+      const formData2 = new FormData();
+      formData2.append('image', file);
+      formData2.append('page', String(page));
+      const res2 = await fetch(`${BASE_URL}/api/products/image-search/`, {
+        method: 'POST',
+        headers: headers2,
+        body: formData2,
+      });
+      if (!res2.ok) throw new Error('Image search failed');
+      return res2.json();
+    }
+  }
+
+  if (!res.ok) throw new Error('Image search failed');
   return res.json();
 }
 

@@ -9,6 +9,22 @@ export interface Product {
   isBookmarked: boolean;
 }
 
+export interface SearchFilters {
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  tags?: string[];
+}
+
+export interface PaginatedProducts {
+  products: Product[];
+  total: number;
+  page: number;
+  page_size: number;
+  has_next: boolean;
+}
+
+// Legacy types — kept for ChatPanel component compatibility
 export interface ChatMessage {
   id: string;
   text: string;

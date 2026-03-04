@@ -179,6 +179,83 @@ body {
     md:[--masonry-cols:3] → columns: 3 (on md+)
 */
 
+/* ─── Search bar drop-in ─── */
+@keyframes searchDrop {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-search-drop {
+  animation: searchDrop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Icon mode pop ─── */
+@keyframes iconPop {
+  0%   { transform: scale(0.85); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.animate-icon-pop { animation: iconPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* ─── Sort pill active pop ─── */
+@keyframes pillActivate {
+  0%   { transform: scale(0.93); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.animate-pill-activate { animation: pillActivate 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* ─── Card image shimmer on hover ─── */
+@keyframes imgShimmer {
+  0%   { opacity: 0; }
+  30%  { opacity: 0.06; }
+  100% { opacity: 0; }
+}
+.animate-img-shimmer { animation: imgShimmer 0.6s ease both; }
+
+/* ─── Skeleton loading shimmer ─── */
+@keyframes skeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Scroll-to-top button pop-in ─── */
+@keyframes scrollTopIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-scroll-top-in {
+  animation: scrollTopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Search pill idle "breathe" glow ─── */
+@keyframes pillBreathe {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.16), 0 10px 36px rgba(0,0,0,0.12);
+  }
+  50% {
+    box-shadow: 0 6px 22px rgba(0,0,0,0.20), 0 14px 42px rgba(0,0,0,0.14),
+                0 0 0 1.5px rgba(196,168,130,0.20);
+  }
+}
+.animate-pill-breathe {
+  animation: pillBreathe 3.2s ease-in-out infinite;
+}
+
+/* ─── Loading amber sweep below pill ─── */
+@keyframes searchSweep {
+  0%   { left: -45%; }
+  100% { left: 110%; }
+}
+
+/* ─── Placeholder slide-up fade ─── */
+@keyframes phSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-ph-in {
+  animation: phSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* ─── Underline slide ─── */
 .underline-slide {
   position: relative;

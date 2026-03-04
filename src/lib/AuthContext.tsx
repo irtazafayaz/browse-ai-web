@@ -17,23 +17,42 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, password2: string, firstName?: string, lastName?: string) => Promise<void>;
   logout: () => Promise<void>;
-  googleAuth: (idToken: string) => Promise<void>;
+  googleAuth: (accessToken: string) => Promise<void>;
 }
 
 /* ── Context ── */
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/* ── getMe with a hard timeout so app never hangs on slow backend ── */
+const GET_ME_TIMEOUT_MS = 8_000;
+async function getMeWithTimeout(): Promise<AuthUser | null> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), GET_ME_TIMEOUT_MS);
+    getMe()
+      .then(u => resolve(u ?? null))
+      .catch(() => resolve(null))
+      .finally(() => clearTimeout(timer));
+  });
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount: restore session if tokens exist
+  // On mount: restore session if tokens exist. If the backend says the user
+  // is gone (returns null) we clear tokens so they don't accumulate stale data.
   useEffect(() => {
     if (tokens.access) {
-      getMe()
-        .then(u => setUser(u ?? null))
-        .catch(() => setUser(null))
-        .finally(() => setLoading(false));
+      getMeWithTimeout().then(u => {
+        if (u) {
+          setUser(u);
+        } else {
+          // Token exists but backend rejected it or user was deleted
+          tokens.clear();
+          setUser(null);
+        }
+        setLoading(false);
+      });
     } else {
       setLoading(false);
     }
@@ -50,12 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await apiLogout();
+    // Clear user state immediately — apiLogout is fire-and-forget
     setUser(null);
+    await apiLogout();
   }, []);
 
-  const googleAuth = useCallback(async (idToken: string) => {
-    const data = await apiGoogleAuth(idToken);
+  const googleAuth = useCallback(async (accessToken: string) => {
+    const data = await apiGoogleAuth(accessToken);
     setUser(data.user);
   }, []);
 
