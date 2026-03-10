@@ -1,5 +1,5 @@
 import { AiResponse, ChatMessage } from './types';
-import { searchProducts as backendSearch } from './api';
+import { searchProducts } from './api';
 
 // ── Fallback mock (used when backend is unreachable) ───────────────────
 function mockResponse(userMessage: string): AiResponse {
@@ -17,11 +17,10 @@ function mockResponse(userMessage: string): AiResponse {
   return { displayText: "Here are some great options based on what you're looking for!", suggestedFilters: [] };
 }
 
-export async function sendMessage(history: ChatMessage[], userMessage: string): Promise<AiResponse> {
+export async function sendMessage(_history: ChatMessage[], userMessage: string): Promise<AiResponse> {
   // Try Django backend first; fall back to mock if unreachable
   try {
-    const historyPayload = history.map(m => ({ sender: m.sender, text: m.text }));
-    const data = await backendSearch(userMessage, historyPayload);
+    const data = await searchProducts(userMessage, 1);
     return {
       displayText: data.displayText,
       suggestedFilters: data.suggestedFilters ?? [],

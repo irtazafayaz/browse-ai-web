@@ -58,22 +58,81 @@ body {
   animation: fadeSlideUp 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
-/* ─── Word / line reveal ─── */
-@keyframes wordReveal {
-  from { opacity: 0; transform: translateY(60%) skewY(4deg); }
-  to   { opacity: 1; transform: translateY(0) skewY(0deg); }
-}
-.word-reveal {
-  display: inline-block;
-  animation: wordReveal 0.75s cubic-bezier(0.19, 1, 0.22, 1) both;
-  will-change: transform, opacity;
+/* ─── itsoffbrand easing ─── */
+:root {
+  --ease-expo: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ─── Clip reveal (text slides up from behind a mask) ─── */
+/* ─── Clip reveal container ─── */
 .clip-wrap {
   overflow: hidden;
   display: inline-block;
+  vertical-align: bottom;
 }
+
+/* ─── Word reveal — pure translate, no opacity fade ─── */
+@keyframes wordReveal {
+  from { transform: translateY(108%); }
+  to   { transform: translateY(0); }
+}
+.word-reveal {
+  display: inline-block;
+  animation: wordReveal 0.95s var(--ease-expo) both;
+  will-change: transform;
+}
+
+/* ─── Character reveal — tighter stagger for headlines ─── */
+@keyframes charReveal {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
+.char-reveal {
+  display: inline-block;
+  animation: charReveal 1.05s var(--ease-expo) both;
+  will-change: transform;
+}
+
+/* ─── Line reveal (scroll-triggered section headings) ─── */
+@keyframes lineReveal {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.line-reveal {
+  display: inline-block;
+  animation: lineReveal 0.9s var(--ease-expo) both;
+  will-change: transform;
+}
+
+/* ─── Eyebrow label fade + lift ─── */
+@keyframes eyebrowIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.eyebrow-in {
+  animation: eyebrowIn 0.7s var(--ease-expo) both;
+}
+
+/* ─── Button dual-text hover slide (itsoffbrand style) ─── */
+.btn-dual {
+  position: relative;
+  overflow: hidden;
+}
+.btn-dual .txt-a,
+.btn-dual .txt-b {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.6s var(--ease-expo);
+  will-change: transform;
+  white-space: nowrap;
+}
+.btn-dual .txt-b { transform: translateY(100%); }
+.btn-dual:hover .txt-a { transform: translateY(-100%); }
+.btn-dual:hover .txt-b { transform: translateY(0%); }
 
 /* ─── Scale in ─── */
 @keyframes scaleIn {

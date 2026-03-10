@@ -78,7 +78,10 @@ export default function ProductCard({
   return (
     <motion.div
       className="group relative flex flex-col cursor-pointer"
-      onClick={() => router.push(`/product/${product.id}`)}
+      onClick={() => {
+        localStorage.setItem(`browseai:product:${product.id}`, JSON.stringify(product));
+        router.push(`/product/${product.id}`);
+      }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

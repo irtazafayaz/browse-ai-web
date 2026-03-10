@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      // Shopify CDN — product images served by the BrowseBy AI API
+      {
+        protocol: 'https',
+        hostname: 'cdn.shopify.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.myshopify.com',
+      },
     ],
   },
 };

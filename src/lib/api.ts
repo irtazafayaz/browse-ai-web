@@ -8,7 +8,7 @@
  * - Auth headers on every request
  */
 
-import { PaginatedProducts } from './types';
+import { PaginatedProducts, SearchResult } from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -182,6 +182,16 @@ export async function getProducts(params: ProductsParams = {}): Promise<Paginate
   const query = qs.toString();
   const res = await apiFetch(`/api/products/${query ? '?' + query : ''}`);
   if (!res.ok) throw new Error('Failed to fetch products');
+  return res.json();
+}
+
+/** AI-powered text search via the BrowseBy AI API. */
+export async function searchProducts(query: string, page = 1): Promise<SearchResult> {
+  const res = await apiFetch('/api/products/search/', {
+    method: 'POST',
+    body: JSON.stringify({ query, page }),
+  });
+  if (!res.ok) throw new Error('Search failed');
   return res.json();
 }
 
