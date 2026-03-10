@@ -32,6 +32,7 @@ export default function EditCard({ edit, onTap }: Props) {
         src={edit.imageUrl}
         alt={edit.label}
         fill
+        quality={80}
         className="object-cover"
         sizes="(max-width: 768px) 50vw, 33vw"
         style={{
