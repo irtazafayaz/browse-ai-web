@@ -1,13 +1,13 @@
-'use client';
-import { useEffect, useRef, useState, useMemo } from 'react';
-import ProductCard, { CardSize } from './ProductCard';
-import { Product } from '@/lib/types';
+"use client";
+import { useEffect, useRef, useState, useMemo } from "react";
+import ProductCard, { CardSize } from "./ProductCard";
+import { Product } from "@/lib/types";
 
 interface Props {
   products: Product[];
   onBookmark: (id: string) => void;
   onMoreLikeThis: (p: Product) => void;
-  onAddToCart?: (id: string) => void;
+  onQuickView?: (product: Product) => void;
 }
 
 /*
@@ -15,13 +15,13 @@ interface Props {
   but APPROX_H is now UNIFORM since all cards share a fixed 4/5 aspect ratio.
 */
 const SIZE_PATTERN: CardSize[] = [
-  'tall',    // 0
-  'short',   // 1
-  'normal',  // 2
-  'tall',    // 3
-  'short',   // 4
-  'normal',  // 5
-  'tall',    // 6
+  "tall", // 0
+  "short", // 1
+  "normal", // 2
+  "tall", // 3
+  "short", // 4
+  "normal", // 5
+  "tall", // 6
 ];
 
 /*
@@ -41,8 +41,8 @@ function useColumnCount() {
       setCols(w >= 1280 ? 5 : w >= 1024 ? 4 : w >= 640 ? 3 : 2);
     };
     update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
   return cols;
 }
@@ -53,7 +53,12 @@ function useReveal(ref: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (!ref.current) return;
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
       { threshold: 0.05 },
     );
     obs.observe(ref.current);
@@ -64,7 +69,13 @@ function useReveal(ref: React.RefObject<HTMLElement | null>) {
 
 /* ── Animated card wrapper ── */
 function RevealCard({
-  product, colIndex, rowInCol, size, onBookmark, onMoreLikeThis, onAddToCart,
+  product,
+  colIndex,
+  rowInCol,
+  size,
+  onBookmark,
+  onMoreLikeThis,
+  onQuickView,
 }: {
   product: Product;
   colIndex: number;
@@ -72,7 +83,7 @@ function RevealCard({
   size: CardSize;
   onBookmark: (id: string) => void;
   onMoreLikeThis: (p: Product) => void;
-  onAddToCart?: (id: string) => void;
+  onQuickView?: (product: Product) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const visible = useReveal(ref);
@@ -90,7 +101,9 @@ function RevealCard({
       ref={ref}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0) scale(1)' : 'translateY(22px) scale(0.97)',
+        transform: visible
+          ? "translateY(0) scale(1)"
+          : "translateY(22px) scale(0.97)",
         transition: `
           opacity   0.5s  cubic-bezier(0.19,1,0.22,1) ${delay}ms,
           transform 0.55s cubic-bezier(0.19,1,0.22,1) ${delay}ms
@@ -101,7 +114,7 @@ function RevealCard({
         product={product}
         onBookmark={onBookmark}
         onMoreLikeThis={onMoreLikeThis}
-        onAddToCart={onAddToCart}
+        onQuickView={onQuickView}
         size={size}
       />
     </div>
@@ -141,9 +154,10 @@ function SkeletonCard({ delay = 0 }: { delay?: number }) {
     <div
       className="rounded-xl overflow-hidden"
       style={{
-        aspectRatio: '4/5',
-        background: 'linear-gradient(90deg, #EDE9E1 25%, #E4DDD3 50%, #EDE9E1 75%)',
-        backgroundSize: '200% 100%',
+        aspectRatio: "4/5",
+        background:
+          "linear-gradient(90deg, #EDE9E1 25%, #E4DDD3 50%, #EDE9E1 75%)",
+        backgroundSize: "200% 100%",
         animation: `skeletonShimmer 1.6s ease-in-out ${delay}ms infinite`,
       }}
     />
@@ -151,22 +165,34 @@ function SkeletonCard({ delay = 0 }: { delay?: number }) {
 }
 
 /* ══ MasonryGrid ══ */
-export default function MasonryGrid({ products, onBookmark, onMoreLikeThis, onAddToCart }: Props) {
+export default function MasonryGrid({
+  products,
+  onBookmark,
+  onMoreLikeThis,
+  onQuickView,
+}: Props) {
   const numCols = useColumnCount();
-  const columns = useMemo(() => packColumns(products, numCols), [products, numCols]);
+  const columns = useMemo(
+    () => packColumns(products, numCols),
+    [products, numCols],
+  );
 
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center gap-4">
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{ background: '#1A1A1A' }}
+          style={{ background: "#1A1A1A" }}
         >
           <span className="text-2xl">🔍</span>
         </div>
         <div>
-          <p className="font-black text-[#1A1A1A] text-base tracking-tight">No results found</p>
-          <p className="text-sm text-[#8B8B8B] mt-1">Try a different search or refine with AI</p>
+          <p className="font-black text-[#1A1A1A] text-base tracking-tight">
+            No results found
+          </p>
+          <p className="text-sm text-[#8B8B8B] mt-1">
+            Try a different search or refine with AI
+          </p>
         </div>
       </div>
     );
@@ -185,7 +211,7 @@ export default function MasonryGrid({ products, onBookmark, onMoreLikeThis, onAd
               size={size}
               onBookmark={onBookmark}
               onMoreLikeThis={onMoreLikeThis}
-              onAddToCart={onAddToCart}
+              onQuickView={onQuickView}
             />
           ))}
         </div>

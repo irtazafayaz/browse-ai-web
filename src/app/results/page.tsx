@@ -1,11 +1,12 @@
 'use client';
+import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import {
-  ArrowLeft, BookmarkCheck, ArrowRight, X,
+  ArrowLeft, BookmarkCheck, ArrowRight, X, Bookmark, Zap,
   Search, Camera, SlidersHorizontal,
   TrendingUp, DollarSign, Star, ArrowUp,
-  ShoppingBag, CornerDownLeft,
+  CornerDownLeft,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MasonryGrid, { MasonrySkeletonGrid } from '@/components/MasonryGrid';
@@ -13,12 +14,11 @@ import Logo from '@/components/Logo';
 import FilterDrawer from '@/components/FilterDrawer';
 import AuthModal from '@/components/AuthModal';
 import { Product, SearchFilters } from '@/lib/types';
-import { getProducts, searchProducts, searchByImage, toggleBookmark } from '@/lib/api';
+import { searchProducts, toggleBookmark } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 
-type SearchMode = 'text' | 'image';
-type SortMode   = 'match' | 'price-asc' | 'price-desc' | 'trending';
-type Gender     = 'Women' | 'Men';
+type SortMode = 'match' | 'price-asc' | 'price-desc' | 'trending';
+type Gender   = 'Women' | 'Men';
 
 function sortProducts(products: Product[], sort: SortMode): Product[] {
   const arr = [...products];
@@ -37,11 +37,8 @@ const SORT_OPTIONS: { id: SortMode; label: string; icon: React.ReactNode }[] = [
   { id: 'price-desc', label: 'Price ↓',    icon: <DollarSign size={11} /> },
 ];
 
-/* SkeletonGrid is now handled by MasonrySkeletonGrid from MasonryGrid.tsx */
-
 const NAV_H = 49;
 
-/* Cycling placeholder suggestions */
 const PLACEHOLDERS = [
   'Search for anything…',
   'Try "oversized blazer"…',
@@ -51,18 +48,14 @@ const PLACEHOLDERS = [
   'Try "wide-leg linen trousers"…',
 ];
 
-/* Trending suggestions shown in the dropdown */
 const TRENDING = [
-  { query: 'Oversized blazer',       emoji: '🔥' },
-  { query: 'Floral midi dress',      emoji: '🌸' },
-  { query: 'Leather ankle boots',    emoji: '👢' },
-  { query: 'Wide-leg trousers',      emoji: '✨' },
-  { query: 'Cashmere turtleneck',    emoji: '🍂' },
+  { query: 'Oversized blazer',    emoji: '🔥' },
+  { query: 'Floral midi dress',   emoji: '🌸' },
+  { query: 'Leather ankle boots', emoji: '👢' },
+  { query: 'Wide-leg trousers',   emoji: '✨' },
+  { query: 'Cashmere turtleneck', emoji: '🍂' },
 ];
 
-/* ═══════════════════════════════════════════════════════════
-   Results content
-═══════════════════════════════════════════════════════════ */
 function ResultsContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
@@ -70,22 +63,13 @@ function ResultsContent() {
   const initialQuery = searchParams.get('q') ?? '';
 
   /* ── Search state ── */
-  const [mode, setMode]               = useState<SearchMode>('text');
-  const [inputValue, setInputValue]   = useState(initialQuery);
+  const [inputValue, setInputValue]     = useState(initialQuery);
   const [inputFocused, setInputFocused] = useState(false);
-  const [query, setQuery]             = useState(initialQuery);
-
-  /* ── Image state ── */
-  const [imageFile, setImageFile]       = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging]     = useState(false);
+  const [query, setQuery]               = useState(initialQuery);
 
   /* ── Placeholder cycling ── */
   const [phIdx, setPhIdx]         = useState(0);
   const [phVisible, setPhVisible] = useState(true);
-
-  /* ── Icon pop on mode switch ── */
-  const [iconPopping, setIconPopping] = useState<SearchMode | null>(null);
 
   /* ── Results state ── */
   const [rawProducts, setRawProducts] = useState<Product[]>([]);
@@ -109,13 +93,20 @@ function ResultsContent() {
   };
 
   /* ── Cart ── */
-  const [cartCount, setCartCount] = useState(0);
-  const handleAddToCart = (id: string) => { void id; setCartCount(n => n + 1); };
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const handleQuickView = (product: Product) => { setQuickViewProduct(product); };
+
+  /* Prevent body scroll when modal is open */
+  useEffect(() => {
+    if (quickViewProduct) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = 'unset'; };
+    }
+  }, [quickViewProduct]);
 
   const sentinelRef  = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  /* ── Scroll-to-top visibility ── */
   const [showScrollTop, setShowScrollTop] = useState(false);
   useEffect(() => {
     const handler = () => setShowScrollTop(window.scrollY > 320);
@@ -123,27 +114,19 @@ function ResultsContent() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  /* ── Cycling placeholder (idle only — stops when typing / focused / image) ── */
+  /* ── Cycling placeholder ── */
   useEffect(() => {
-    if (inputFocused || inputValue || imagePreview) return;
+    if (inputFocused || inputValue) return;
     const id = setInterval(() => {
       setPhVisible(false);
-      setTimeout(() => {
-        setPhIdx(i => (i + 1) % PLACEHOLDERS.length);
-        setPhVisible(true);
-      }, 280);
+      setTimeout(() => { setPhIdx(i => (i + 1) % PLACEHOLDERS.length); setPhVisible(true); }, 280);
     }, 3600);
     return () => clearInterval(id);
-  }, [inputFocused, inputValue, imagePreview]);
-
-  /* ── Icon pop helper ── */
-  const popIcon = (m: SearchMode) => {
-    setIconPopping(m);
-    setTimeout(() => setIconPopping(null), 380);
-  };
+  }, [inputFocused, inputValue]);
 
   const displayProducts = sortProducts(rawProducts, sort);
   const bookmarkCount   = rawProducts.filter(p => p.isBookmarked).length;
+  const hasResults      = loading || rawProducts.length > 0;
 
   const activeFilterCount = [
     filters.brand,
@@ -151,33 +134,14 @@ function ResultsContent() {
     ...(filters.tags ?? []),
   ].filter(Boolean).length;
 
-  /* ══ Fetchers ══ */
+  /* ── Fetcher ── */
   const fetchText = useCallback(async (
     q: string, f: SearchFilters, pageNum: number, reset: boolean,
   ) => {
+    if (!q) return;
     if (reset) setLoading(true); else setLoadingMore(true);
     try {
-      // When a query is present → BrowseBy AI API (POST /api/products/search/)
-      // When browsing with no query → MongoDB product list with filters
-      const r = q
-        ? await searchProducts(q, pageNum)
-        : await getProducts({
-            page: pageNum,
-            brand: f.brand, min_price: f.minPrice, max_price: f.maxPrice,
-            tags: f.tags?.length ? f.tags : undefined,
-          });
-      setTotal(r.total); setPage(pageNum); setHasNext(r.has_next);
-      if (reset) setRawProducts(r.products);
-      else       setRawProducts(prev => [...prev, ...r.products]);
-    } catch { /* silent */ } finally {
-      if (reset) setLoading(false); else setLoadingMore(false);
-    }
-  }, []);
-
-  const fetchImage = useCallback(async (file: File, pageNum: number, reset: boolean) => {
-    if (reset) setLoading(true); else setLoadingMore(true);
-    try {
-      const r = await searchByImage(file, pageNum);
+      const r = await searchProducts(q, pageNum);
       setTotal(r.total); setPage(pageNum); setHasNext(r.has_next);
       if (reset) setRawProducts(r.products);
       else       setRawProducts(prev => [...prev, ...r.products]);
@@ -191,7 +155,7 @@ function ResultsContent() {
   useEffect(() => {
     if (mountedRef.current) return;
     mountedRef.current = true;
-    fetchText(initialQuery, {}, 1, true);
+    if (initialQuery) fetchText(initialQuery, {}, 1, true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -203,21 +167,11 @@ function ResultsContent() {
     const fChanged = JSON.stringify(filters) !== JSON.stringify(prevFiltersRef.current);
     prevQueryRef.current   = query;
     prevFiltersRef.current = filters;
-    if (mode === 'text' && (qChanged || fChanged)) fetchText(query, filters, 1, true);
-  }, [query, filters, mode, fetchText]);
-
-  /* ── Mode switch ── */
-  const prevModeRef = useRef(mode);
-  useEffect(() => {
-    if (mode === prevModeRef.current) return;
-    prevModeRef.current = mode;
-    if (mode === 'image') {
-      if (!imageFile) { setRawProducts([]); setTotal(0); setHasNext(false); }
-    } else {
-      fetchText(query, filters, 1, true);
+    if (qChanged || fChanged) {
+      if (query) fetchText(query, filters, 1, true);
+      else { setRawProducts([]); setTotal(0); setHasNext(false); }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [query, filters, fetchText]);
 
   /* ── Infinite scroll ── */
   useEffect(() => {
@@ -225,55 +179,213 @@ function ResultsContent() {
     if (!el) return;
     const obs = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && hasNext && !loadingMore && !loading) {
-        if (mode === 'text') fetchText(query, filters, page + 1, false);
-        else if (imageFile)  fetchImage(imageFile, page + 1, false);
+        fetchText(query, filters, page + 1, false);
       }
     }, { threshold: 0.1 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [hasNext, loadingMore, loading, page, mode, query, filters, imageFile, fetchText, fetchImage]);
+  }, [hasNext, loadingMore, loading, page, query, filters, fetchText]);
 
-  /* ══ Handlers ══ */
+  /* ── Handlers ── */
   const handleTextSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const t = inputValue.trim();
-    if (!t && !imageFile) return;
-    if (t) {
-      setQuery(t);
-      router.replace(`/results?q=${encodeURIComponent(t)}`, { scroll: false });
-    }
-    if (mode === 'image' && imageFile) fetchImage(imageFile, 1, true);
+    if (!t) return;
+    setQuery(t);
+    router.replace(`/results?q=${encodeURIComponent(t)}`, { scroll: false });
   };
 
-  const handleImageFile = useCallback((file: File) => {
-    if (!file.type.startsWith('image/')) return;
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setMode('image');
-    fetchImage(file, 1, true);
-  }, [imagePreview, fetchImage]);
-
   const handleBookmark = useCallback((id: string) => {
+    if (!user) {
+      setAuthOpen(true);
+      return;
+    }
     setRawProducts(prev => prev.map(p => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p));
     toggleBookmark(id).catch(() =>
       setRawProducts(prev => prev.map(p => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p))
     );
-  }, []);
+  }, [user]);
 
   const clearAll = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(null);
-    setImagePreview(null);
     setInputValue('');
     setQuery('');
-    setMode('text');
+    setRawProducts([]);
+    setTotal(0);
+    setHasNext(false);
     router.replace('/results', { scroll: false });
-    fetchText('', {}, 1, true);
   };
 
-  const hasInput = !!inputValue || !!imagePreview;
-  const pillDark = inputFocused || isDragging || (!!imagePreview && !inputFocused);
+  const hasInput = !!inputValue;
+
+  /* ── Search pill JSX (shared between centered and bottom states) ── */
+  const pill = (
+    <form onSubmit={handleTextSearch}>
+      <div
+        className={`flex items-center ${!inputFocused ? 'animate-pill-breathe' : ''}`}
+        style={{
+          background: 'rgba(30, 27, 23, 0.93)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: 100,
+          border: '1px solid rgba(255,255,255,0.07)',
+          padding: '6px 6px 6px 20px',
+          boxShadow: inputFocused
+            ? '0 0 0 2px #C4A882, 0 8px 32px rgba(0,0,0,0.25), 0 20px 50px rgba(0,0,0,0.15)'
+            : undefined,
+          transform: inputFocused ? 'translateY(-2px) scale(1.006)' : 'translateY(0) scale(1)',
+          transition: 'box-shadow 0.25s ease, transform 0.35s cubic-bezier(0.19,1,0.22,1)',
+        }}
+      >
+        {/* Search icon */}
+        <Search size={16} style={{ marginRight: 8, color: 'rgba(255,255,255,0.92)', flexShrink: 0 }} />
+
+        {/* Camera icon — coming soon */}
+        <button
+          type="button"
+          onClick={showComingSoon}
+          title="Image search (coming soon)"
+          className="shrink-0 active:scale-90"
+          style={{ marginRight: 14, lineHeight: 0 }}
+        >
+          <Camera size={16} style={{ color: 'rgba(255,255,255,0.28)' }} />
+        </button>
+
+        {/* Divider */}
+        <div
+          className="shrink-0 self-stretch"
+          style={{ width: 1, background: 'rgba(255,255,255,0.09)', margin: '5px 16px 5px 0' }}
+        />
+
+        {/* Text input */}
+        <div className="relative flex-1 min-w-0" style={{ marginRight: 8 }}>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            placeholder=""
+            className="w-full bg-transparent outline-none"
+            style={{
+              color: 'rgba(255,255,255,0.88)',
+              caretColor: '#C4A882',
+              fontSize: 14,
+              fontWeight: 500,
+              letterSpacing: '-0.01em',
+            }}
+          />
+          {!inputValue && (
+            <span
+              key={phIdx}
+              className="absolute inset-0 flex items-center pointer-events-none select-none"
+              style={{
+                color: inputFocused ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.36)',
+                fontSize: 14,
+                fontWeight: 500,
+                letterSpacing: '-0.01em',
+                opacity: phVisible ? 1 : 0,
+                transform: phVisible ? 'translateY(0)' : 'translateY(-5px)',
+                transition: 'opacity 0.28s ease, transform 0.3s ease',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+              }}
+            >
+              {PLACEHOLDERS[phIdx]}
+            </span>
+          )}
+        </div>
+
+        {/* Clear */}
+        {hasInput && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90 hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.09)', marginRight: 4 }}
+          >
+            <X size={11} style={{ color: 'rgba(255,255,255,0.45)' }} />
+          </button>
+        )}
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-105 active:scale-90"
+          style={{
+            background: loading || inputFocused ? '#C4A882' : 'rgba(255,255,255,0.10)',
+            boxShadow: loading || inputFocused ? '0 4px 14px rgba(196,168,130,0.45)' : 'none',
+            transition: 'background 0.22s ease, box-shadow 0.22s ease',
+          }}
+        >
+          {loading ? (
+            <div className="w-4 h-4 rounded-full border-2 animate-spin"
+              style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'white' }} />
+          ) : (
+            <ArrowRight size={15} className="text-white" />
+          )}
+        </button>
+      </div>
+
+      {/* Amber sweep bar */}
+      <div className="relative mx-3 mt-1.5 rounded-full overflow-hidden"
+        style={{ height: 2, opacity: loading ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+        <div className="absolute top-0 h-full rounded-full" style={{
+          width: '42%',
+          background: 'linear-gradient(90deg, transparent, #C4A882 40%, #E8C99A 60%, transparent)',
+          animation: 'searchSweep 1.35s ease-in-out infinite',
+        }} />
+      </div>
+    </form>
+  );
+
+  const trending = (
+    <AnimatePresence>
+      {inputFocused && !inputValue && (
+        <motion.div
+          initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0,  scale: 1    }}
+          exit={{    opacity: 0, y: -6, scale: 0.98 }}
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute left-0 right-0 z-50 rounded-2xl overflow-hidden"
+          style={{
+            top: 'calc(100% + 8px)',
+            background: 'rgba(26, 23, 20, 0.97)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.32)',
+          }}
+        >
+          <div className="px-3 pt-3 pb-2">
+            <p className="text-[9px] font-black uppercase tracking-[0.16em] mb-1.5 px-2"
+              style={{ color: 'rgba(255,255,255,0.28)' }}>
+              Trending searches
+            </p>
+            {TRENDING.map((item, i) => (
+              <motion.button
+                key={item.query}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                onMouseDown={() => {
+                  setInputValue(item.query);
+                  setQuery(item.query);
+                  router.replace(`/results?q=${encodeURIComponent(item.query)}`, { scroll: false });
+                }}
+                className="w-full flex items-center gap-3 py-2 px-2 rounded-xl text-left transition-colors"
+                style={{ color: 'rgba(255,255,255,0.78)' }}
+                whileHover={{ background: 'rgba(255,255,255,0.05)' }}
+              >
+                <span className="text-base leading-none">{item.emoji}</span>
+                <span className="flex-1 text-[13px] font-medium">{item.query}</span>
+                <CornerDownLeft size={11} style={{ color: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   /* ══════════════════════════════════════════════════════════
      Render
@@ -281,9 +393,10 @@ function ResultsContent() {
   return (
     <div style={{ minHeight: '100dvh', background: '#F2EDE4' }}>
 
-      {/* ══════════════════════════════════
-          STICKY NAV
-      ══════════════════════════════════ */}
+      {/* Auth Modal */}
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {/* ── Nav ── */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-4"
         style={{
@@ -305,37 +418,13 @@ function ResultsContent() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Cart badge */}
-          <motion.button
-            className="relative w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] transition-colors"
-            whileTap={{ scale: 0.9 }}
-            title="Cart"
-          >
-            <ShoppingBag size={15} className="text-[#1A1A1A]" />
-            <AnimatePresence>
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  exit={{ scale: 0 }}
-                  transition={{ type: 'spring', stiffness: 600, damping: 22 }}
-                  className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black text-white"
-                  style={{ background: '#C4A882' }}
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
-
           {bookmarkCount > 0 && (
             <div className="flex items-center gap-1.5 text-white text-[11px] font-semibold rounded-full px-2.5 py-1"
               style={{ background: '#1A1A1A' }}>
               <BookmarkCheck size={11} />{bookmarkCount}
             </div>
           )}
-          <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+
           {user ? (
             <button onClick={() => setAuthOpen(true)}
               className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center font-black text-white text-[10px] transition-all hover:scale-105 active:scale-95"
@@ -355,466 +444,259 @@ function ResultsContent() {
         </div>
       </header>
 
-      {/* ══════════════════════════════════
-          FLOATING SEARCH PILL
-          — single unified pill, both icons visible
-      ══════════════════════════════════ */}
-      <div
-        className="sticky z-20 px-4 py-3 pointer-events-none"
-        style={{ top: NAV_H }}
-      >
-        <div className="relative max-w-2xl mx-auto pointer-events-auto animate-search-drop">
-          <form
-            onSubmit={handleTextSearch}
-            onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsDragging(false); }}
-            onDrop={e => {
-              e.preventDefault();
-              setIsDragging(false);
-              const f = e.dataTransfer.files[0];
-              if (f) handleImageFile(f);
-            }}
+      {/* ── Filter bar — only when results ── */}
+      {hasResults && (
+        <>
+          <div
+            className="flex items-center gap-2 px-4 py-2.5"
+            style={{ borderBottom: '1px solid rgba(212,196,168,0.2)' }}
           >
-            {/* ── Search pill ── */}
-            <div
-              className={`flex items-center ${!inputFocused && !isDragging ? 'animate-pill-breathe' : ''}`}
-              style={{
-                background: 'rgba(30, 27, 23, 0.93)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderRadius: 100,
-                border: '1px solid rgba(255,255,255,0.07)',
-                padding: '6px 6px 6px 20px',
-                gap: 0,
-                /* Override CSS breathe anim with focused/drag shadow */
-                boxShadow: inputFocused
-                  ? '0 0 0 2px #C4A882, 0 8px 32px rgba(0,0,0,0.25), 0 20px 50px rgba(0,0,0,0.15)'
-                  : isDragging
-                    ? '0 0 0 2px #C4A882, 0 8px 28px rgba(0,0,0,0.22)'
-                    : undefined,
-                transform: inputFocused || isDragging ? 'translateY(-2px) scale(1.006)' : 'translateY(0) scale(1)',
-                transition: 'box-shadow 0.25s ease, transform 0.35s cubic-bezier(0.19,1,0.22,1)',
-              }}
-            >
-              {/* Search icon — springs when switching to text mode */}
-              <button
-                type="button"
-                onClick={() => { setMode('text'); setImageFile(null); setImagePreview(null); popIcon('text'); }}
-                className={`shrink-0 active:scale-90 ${iconPopping === 'text' ? 'animate-icon-pop' : ''}`}
-                style={{ marginRight: 8, lineHeight: 0 }}
-                title="Text search"
-              >
-                <Search
-                  size={16}
-                  style={{
-                    color: mode === 'text' ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.28)',
-                    transition: 'color 0.18s ease',
-                  }}
-                />
-              </button>
-
-              {/* Camera icon — coming soon */}
-              <button
-                type="button"
-                onClick={() => { showComingSoon(); popIcon('image'); }}
-                title="Image search (coming soon)"
-                className={`shrink-0 active:scale-90 ${iconPopping === 'image' ? 'animate-icon-pop' : ''}`}
-                style={{ marginRight: 14, lineHeight: 0 }}
-              >
-                {imagePreview ? (
-                  <div
-                    className="w-6 h-6 rounded-full overflow-hidden"
-                    style={{
-                      border: '1.5px solid rgba(255,255,255,0.3)',
-                      boxShadow: '0 0 0 2px rgba(196,168,130,0.4)',
-                      animation: 'scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both',
-                    }}
-                  >
-                    <img src={imagePreview} alt="uploaded" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <Camera
-                    size={16}
-                    style={{
-                      color: mode === 'image' ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.28)',
-                      transition: 'color 0.18s ease',
-                    }}
-                  />
-                )}
-              </button>
-
-              {/* Divider */}
-              <div
-                className="shrink-0 self-stretch"
-                style={{ width: 1, background: 'rgba(255,255,255,0.09)', margin: '5px 16px 5px 0' }}
-              />
-
-              {/* Text input + animated placeholder overlay */}
-              <div className="relative flex-1 min-w-0" style={{ marginRight: 8 }}>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  onFocus={() => setInputFocused(true)}
-                  onBlur={() => setInputFocused(false)}
-                  placeholder=""
-                  className="w-full bg-transparent outline-none"
-                  style={{
-                    color: 'rgba(255,255,255,0.88)',
-                    caretColor: '#C4A882',
-                    fontSize: 14,
-                    fontWeight: 500,
-                    letterSpacing: '-0.01em',
-                  }}
-                />
-                {/* Cycling placeholder — visible only when input is empty & idle */}
-                {!inputValue && !imagePreview && (
-                  <span
-                    key={phIdx}
-                    className="absolute inset-0 flex items-center pointer-events-none select-none animate-ph-in"
-                    style={{
-                      color: inputFocused ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.36)',
-                      fontSize: 14,
-                      fontWeight: 500,
-                      letterSpacing: '-0.01em',
-                      opacity: phVisible ? 1 : 0,
-                      transform: phVisible ? 'translateY(0)' : 'translateY(-5px)',
-                      transition: 'opacity 0.28s ease, transform 0.3s ease',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {isDragging ? 'Drop image here…' : PLACEHOLDERS[phIdx]}
-                  </span>
-                )}
-              </div>
-
-              {/* Clear */}
-              {hasInput && (
+            {/* Gender toggle */}
+            <div className="flex rounded-full p-[3px] shrink-0" style={{ background: 'rgba(0,0,0,0.06)' }}>
+              {(['Women', 'Men'] as Gender[]).map(g => (
                 <button
-                  type="button"
-                  onClick={clearAll}
-                  className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90 hover:opacity-80"
-                  style={{ background: 'rgba(255,255,255,0.09)', marginRight: 4 }}
+                  key={g}
+                  onClick={() => g === 'Men' ? showComingSoon() : setGender(g)}
+                  className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-200"
+                  style={{
+                    background: gender === g ? '#1A1A1A' : 'transparent',
+                    color: gender === g ? 'white' : '#9B9B9B',
+                    boxShadow: gender === g ? '0 2px 6px rgba(0,0,0,0.2)' : 'none',
+                  }}
                 >
-                  <X size={11} style={{ color: 'rgba(255,255,255,0.45)' }} />
+                  {g}
+                </button>
+              ))}
+            </div>
+
+            {/* Result count */}
+            <div className="flex-1 min-w-0">
+              {loading ? (
+                <div className="h-3 w-20 rounded-full animate-pulse" style={{ background: '#EDE9E1' }} />
+              ) : rawProducts.length > 0 ? (
+                <p className="text-[11.5px] font-medium truncate" style={{ color: '#9B9B9B' }}>
+                  {total.toLocaleString()} {total === 1 ? 'result' : 'results'}
+                  {query && <> · <span style={{ color: '#6B6B6B', fontWeight: 700 }}>&ldquo;{query}&rdquo;</span></>}
+                </p>
+              ) : null}
+            </div>
+
+            {/* Sort pills */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {SORT_OPTIONS.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setSort(opt.id)}
+                  className="relative flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold active:scale-95"
+                  style={{
+                    color: sort === opt.id ? 'white' : '#6B6B6B',
+                    transition: 'color 0.18s ease',
+                    background: sort === opt.id ? 'transparent' : '#EAE5DC',
+                  }}
+                >
+                  {sort === opt.id && (
+                    <motion.div
+                      layoutId="sort-pill-bg"
+                      className="absolute inset-0 rounded-full"
+                      style={{ background: '#1A1A1A', boxShadow: '0 0 0 2px rgba(196,168,130,0.40), 0 4px 14px rgba(0,0,0,0.18)' }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1">{opt.icon}<span>{opt.label}</span></span>
+                </button>
+              ))}
+            </div>
+
+            {/* Filter button */}
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 active:scale-95 shrink-0"
+              style={{ background: activeFilterCount > 0 ? '#1A1A1A' : '#EAE5DC', color: activeFilterCount > 0 ? 'white' : '#6B6B6B' }}
+            >
+              <SlidersHorizontal size={11} />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black"
+                  style={{ background: 'rgba(255,255,255,0.22)' }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Active filter chips */}
+          {activeFilterCount > 0 && (
+            <div className="px-4 py-1.5 flex gap-1.5 flex-wrap"
+              style={{ borderBottom: '1px solid rgba(212,196,168,0.15)' }}>
+              {filters.brand && (
+                <button onClick={() => setFilters(f => ({ ...f, brand: undefined }))}
+                  className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full hover:opacity-80 active:scale-95"
+                  style={{ background: '#1A1A1A' }}>
+                  {filters.brand}<X size={8} className="opacity-60" />
                 </button>
               )}
-
-              {/* Submit — amber on focus, spinner when loading */}
-              <button
-                type="submit"
-                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-105 active:scale-90"
-                style={{
-                  background: loading || inputFocused ? '#C4A882' : 'rgba(255,255,255,0.10)',
-                  boxShadow: loading || inputFocused ? '0 4px 14px rgba(196,168,130,0.45)' : 'none',
-                  transition: 'background 0.22s ease, box-shadow 0.22s ease',
-                }}
-              >
-                {loading ? (
-                  <div
-                    className="w-4 h-4 rounded-full border-2 animate-spin"
-                    style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'white' }}
-                  />
-                ) : (
-                  <ArrowRight size={15} className="text-white" />
-                )}
+              {(filters.minPrice != null || filters.maxPrice != null) && (
+                <button onClick={() => setFilters(f => ({ ...f, minPrice: undefined, maxPrice: undefined }))}
+                  className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full hover:opacity-80 active:scale-95"
+                  style={{ background: '#1A1A1A' }}>
+                  {filters.minPrice != null ? `$${filters.minPrice}` : ''}
+                  {filters.minPrice != null && filters.maxPrice != null ? '–' : ''}
+                  {filters.maxPrice != null ? `$${filters.maxPrice}` : ''}
+                  <X size={8} className="opacity-60" />
+                </button>
+              )}
+              {(filters.tags ?? []).map(t => (
+                <button key={t}
+                  onClick={() => setFilters(f => ({ ...f, tags: (f.tags ?? []).filter(x => x !== t) }))}
+                  className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full capitalize hover:opacity-80 active:scale-95"
+                  style={{ background: '#1A1A1A' }}>
+                  {t}<X size={8} className="opacity-60" />
+                </button>
+              ))}
+              <button onClick={() => setFilters({})}
+                className="px-2.5 py-1 text-[10.5px] font-medium rounded-full hover:text-[#1A1A1A] active:scale-95"
+                style={{ border: '1px solid rgba(212,196,168,0.6)', color: '#9B9B9B' }}>
+                Clear all
               </button>
             </div>
-
-            {/* ── Amber sweep bar — appears while loading ── */}
-            <div
-              className="relative mx-3 mt-1.5 rounded-full overflow-hidden"
-              style={{
-                height: 2,
-                opacity: loading ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-              }}
-            >
-              <div
-                className="absolute top-0 h-full rounded-full"
-                style={{
-                  width: '42%',
-                  background: 'linear-gradient(90deg, transparent, #C4A882 40%, #E8C99A 60%, transparent)',
-                  animation: 'searchSweep 1.35s ease-in-out infinite',
-                }}
-              />
-            </div>
-          </form>
-
-          {/* ── Trending suggestions dropdown ── */}
-          <AnimatePresence>
-            {inputFocused && !inputValue && !imagePreview && (
-              <motion.div
-                initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0,  scale: 1    }}
-                exit={{    opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute left-0 right-0 z-50 rounded-2xl overflow-hidden"
-                style={{
-                  top: 'calc(100% + 8px)',
-                  background: 'rgba(26, 23, 20, 0.97)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: '0 16px 48px rgba(0,0,0,0.32)',
-                }}
-              >
-                <div className="px-3 pt-3 pb-2">
-                  <p className="text-[9px] font-black uppercase tracking-[0.16em] mb-1.5 px-2"
-                    style={{ color: 'rgba(255,255,255,0.28)' }}>
-                    Trending searches
-                  </p>
-                  {TRENDING.map((item, i) => (
-                    <motion.button
-                      key={item.query}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
-                      onMouseDown={() => {
-                        setInputValue(item.query);
-                        setQuery(item.query);
-                        router.replace(`/results?q=${encodeURIComponent(item.query)}`, { scroll: false });
-                      }}
-                      className="w-full flex items-center gap-3 py-2 px-2 rounded-xl text-left transition-colors"
-                      style={{ color: 'rgba(255,255,255,0.78)' }}
-                      whileHover={{ background: 'rgba(255,255,255,0.05)' }}
-                    >
-                      <span className="text-base leading-none">{item.emoji}</span>
-                      <span className="flex-1 text-[13px] font-medium">{item.query}</span>
-                      <CornerDownLeft size={11} style={{ color: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={e => {
-              const f = e.target.files?.[0];
-              if (f) handleImageFile(f);
-              e.target.value = '';
-            }}
-          />
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════
-          SORT + FILTER BAR
-      ══════════════════════════════════ */}
-      <div
-        className="flex items-center gap-2 px-4 py-2.5"
-        style={{ borderBottom: '1px solid rgba(212,196,168,0.2)' }}
-      >
-        {/* Gender toggle */}
-        <div
-          className="flex rounded-full p-[3px] shrink-0"
-          style={{ background: 'rgba(0,0,0,0.06)' }}
-        >
-          {(['Women', 'Men'] as Gender[]).map(g => (
-            <button
-              key={g}
-              onClick={() => g === 'Men' ? showComingSoon() : setGender(g)}
-              className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-200"
-              style={{
-                background: gender === g ? '#1A1A1A' : 'transparent',
-                color: gender === g ? 'white' : '#9B9B9B',
-                boxShadow: gender === g ? '0 2px 6px rgba(0,0,0,0.2)' : 'none',
-              }}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
-
-        {/* Result count */}
-        <div className="flex-1 min-w-0">
-          {loading ? (
-            <div className="h-3 w-20 rounded-full animate-pulse" style={{ background: '#EDE9E1' }} />
-          ) : rawProducts.length > 0 ? (
-            <p className="text-[11.5px] font-medium truncate" style={{ color: '#9B9B9B' }}>
-              {total.toLocaleString()} {total === 1 ? 'result' : 'results'}
-              {query && mode === 'text' && (
-                <> · <span style={{ color: '#6B6B6B', fontWeight: 700 }}>&ldquo;{query}&rdquo;</span></>
-              )}
-              {imagePreview && mode === 'image' && (
-                <> · <span style={{ color: '#6B6B6B', fontWeight: 700 }}>visual search</span></>
-              )}
-            </p>
-          ) : null}
-        </div>
-
-        {/* Sort pills — shared layoutId background slides between active pill */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {SORT_OPTIONS.map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => setSort(opt.id)}
-              className="relative flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold active:scale-95"
-              style={{
-                color: sort === opt.id ? 'white' : '#6B6B6B',
-                transition: 'color 0.18s ease',
-                background: sort === opt.id ? 'transparent' : '#EAE5DC',
-              }}
-            >
-              {sort === opt.id && (
-                <motion.div
-                  layoutId="sort-pill-bg"
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: '#1A1A1A',
-                    boxShadow: '0 0 0 2px rgba(196,168,130,0.40), 0 4px 14px rgba(0,0,0,0.18)',
-                  }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-1">
-                {opt.icon}
-                <span>{opt.label}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* Filter button */}
-        <button
-          onClick={() => setFilterOpen(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 active:scale-95 shrink-0"
-          style={{
-            background: activeFilterCount > 0 ? '#1A1A1A' : '#EAE5DC',
-            color: activeFilterCount > 0 ? 'white' : '#6B6B6B',
-          }}
-        >
-          <SlidersHorizontal size={11} />
-          <span>Filters</span>
-          {activeFilterCount > 0 && (
-            <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black"
-              style={{ background: 'rgba(255,255,255,0.22)' }}>
-              {activeFilterCount}
-            </span>
           )}
-        </button>
-      </div>
-
-      {/* ── Active filter chips ── */}
-      {activeFilterCount > 0 && (
-        <div className="px-4 py-1.5 flex gap-1.5 flex-wrap"
-          style={{ borderBottom: '1px solid rgba(212,196,168,0.15)' }}>
-          {filters.brand && (
-            <button onClick={() => setFilters(f => ({ ...f, brand: undefined }))}
-              className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full transition-all hover:opacity-80 active:scale-95"
-              style={{ background: '#1A1A1A' }}>
-              {filters.brand}<X size={8} className="opacity-60" />
-            </button>
-          )}
-          {(filters.minPrice != null || filters.maxPrice != null) && (
-            <button onClick={() => setFilters(f => ({ ...f, minPrice: undefined, maxPrice: undefined }))}
-              className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full transition-all hover:opacity-80 active:scale-95"
-              style={{ background: '#1A1A1A' }}>
-              {filters.minPrice != null ? `$${filters.minPrice}` : ''}
-              {filters.minPrice != null && filters.maxPrice != null ? '–' : ''}
-              {filters.maxPrice != null ? `$${filters.maxPrice}` : ''}
-              <X size={8} className="opacity-60" />
-            </button>
-          )}
-          {(filters.tags ?? []).map(t => (
-            <button key={t}
-              onClick={() => setFilters(f => ({ ...f, tags: (f.tags ?? []).filter(x => x !== t) }))}
-              className="flex items-center gap-1 px-2.5 py-1 text-white text-[10.5px] font-semibold rounded-full capitalize transition-all hover:opacity-80 active:scale-95"
-              style={{ background: '#1A1A1A' }}>
-              {t}<X size={8} className="opacity-60" />
-            </button>
-          ))}
-          <button onClick={() => setFilters({})}
-            className="px-2.5 py-1 text-[10.5px] font-medium rounded-full transition-all hover:text-[#1A1A1A] active:scale-95"
-            style={{ border: '1px solid rgba(212,196,168,0.6)', color: '#9B9B9B' }}>
-            Clear all
-          </button>
-        </div>
+        </>
       )}
 
-      {/* ══════════════════════════════════
-          PRODUCT GRID
-      ══════════════════════════════════ */}
-      <main style={{ padding: '16px 14px 80px' }}>
-        {loading ? (
-          <MasonrySkeletonGrid cols={5} />
-        ) : displayProducts.length === 0 ? (
+      {/* ── Product grid (extra bottom padding for fixed pill) ── */}
+      {hasResults && (
+        <main style={{ padding: '16px 14px 120px' }}>
+          {loading ? (
+            <MasonrySkeletonGrid cols={5} />
+          ) : displayProducts.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col items-center justify-center gap-4 py-28"
+            >
+              <motion.div
+                animate={{ y: [0, -10, 0], rotate: [0, -6, 6, 0] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-5xl select-none"
+              >🔍</motion.div>
+              <div className="text-center">
+                <p className="font-black text-[#1A1A1A] text-base" style={{ letterSpacing: '-0.02em' }}>
+                  No results found
+                </p>
+                <p className="text-sm max-w-xs mt-1" style={{ color: '#9B9B9B' }}>
+                  Try a different search or clear your filters.
+                </p>
+              </div>
+              {activeFilterCount > 0 && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.28, type: 'spring', stiffness: 400, damping: 25 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setFilters({})}
+                  className="px-4 py-2 text-sm font-bold text-[#1A1A1A] rounded-full hover:bg-[#E8E0D4]"
+                  style={{ border: '1.5px solid #D4C4A8' }}
+                >
+                  Clear filters
+                </motion.button>
+              )}
+            </motion.div>
+          ) : (
+            <>
+              <MasonryGrid
+                products={displayProducts}
+                onBookmark={handleBookmark}
+                onMoreLikeThis={() => {}}
+                onQuickView={handleQuickView}
+              />
+              <div ref={sentinelRef} className="h-4" />
+              {loadingMore && (
+                <div className="flex justify-center py-5">
+                  <div className="flex gap-1.5">
+                    {[0, 1, 2].map(i => (
+                      <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce"
+                        style={{ background: '#C4A882', animationDelay: `${i * 150}ms` }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {!hasNext && !loadingMore && rawProducts.length > 0 && (
+                <p className="text-center text-[11px] py-6 font-medium" style={{ color: '#CCCCCC' }}>
+                  All {total.toLocaleString()} results shown
+                </p>
+              )}
+            </>
+          )}
+        </main>
+      )}
+
+      {/* ══ SEARCH PILL — centered when empty, fixed bottom when results ══ */}
+      <AnimatePresence mode="wait">
+        {!hasResults ? (
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center justify-center gap-4 py-28"
+            key="centered"
+            style={{
+              position: 'fixed',
+              top: NAV_H,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 16px',
+              pointerEvents: 'none',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
           >
-            <motion.div
-              animate={{ y: [0, -10, 0], rotate: [0, -6, 6, 0] }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-5xl select-none"
-            >
-              🔍
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              className="text-center"
-            >
-              <p className="font-black text-[#1A1A1A] text-base" style={{ letterSpacing: '-0.02em' }}>
-                No results found
-              </p>
-              <p className="text-sm text-center max-w-xs mt-1" style={{ color: '#9B9B9B' }}>
-                {mode === 'text'
-                  ? 'Try a different search or clear your filters.'
-                  : 'Upload a photo to find similar products.'}
-              </p>
-            </motion.div>
-            {activeFilterCount > 0 && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.28, type: 'spring', stiffness: 400, damping: 25 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setFilters({})}
-                className="mt-1 px-4 py-2 text-sm font-bold text-[#1A1A1A] rounded-full transition-colors hover:bg-[#E8E0D4]"
-                style={{ border: '1.5px solid #D4C4A8' }}
-              >
-                Clear filters
-              </motion.button>
-            )}
+            <p className="text-[13px] font-medium mb-4 pointer-events-none select-none"
+              style={{ color: '#BBBBBB' }}>
+              Describe what you&apos;re looking for
+            </p>
+            <div className="relative w-full pointer-events-auto" style={{ maxWidth: 640 }}>
+              {pill}
+              {trending}
+            </div>
           </motion.div>
         ) : (
-          <>
-            <MasonryGrid
-              products={displayProducts}
-              onBookmark={handleBookmark}
-              onMoreLikeThis={() => {}}
-              onAddToCart={handleAddToCart}
-            />
-            <div ref={sentinelRef} className="h-4" />
-            {loadingMore && (
-              <div className="flex justify-center py-5">
-                <div className="flex gap-1.5">
-                  {[0, 1, 2].map(i => (
-                    <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce"
-                      style={{ background: '#C4A882', animationDelay: `${i * 150}ms` }} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {!hasNext && !loadingMore && rawProducts.length > 0 && (
-              <p className="text-center text-[11px] py-6 font-medium" style={{ color: '#CCCCCC' }}>
-                All {total.toLocaleString()} results shown
-              </p>
-            )}
-          </>
+          <motion.div
+            key="bottom"
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 20,
+              padding: '10px 16px 14px',
+              background: 'transparent',
+              pointerEvents: 'auto',
+            }}
+            initial={{ y: 200, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 200, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 32 }}
+          >
+            <div className="relative max-w-2xl mx-auto">
+              {pill}
+              {trending}
+            </div>
+          </motion.div>
         )}
-      </main>
+      </AnimatePresence>
+
+      {/* Hidden file input — always in DOM */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={e => { e.target.value = ''; }}
+      />
 
       <FilterDrawer
         open={filterOpen}
@@ -824,22 +706,18 @@ function ResultsContent() {
         activeCount={activeFilterCount}
       />
 
-      {/* ── Scroll-to-top button ── */}
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Back to top"
-          className="fixed bottom-6 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center animate-scroll-top-in hover:scale-110 active:scale-90 transition-transform"
-          style={{
-            background: '#1A1A1A',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.12)',
-          }}
+          className="fixed bottom-24 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-transform"
+          style={{ background: '#1A1A1A', boxShadow: '0 4px 20px rgba(0,0,0,0.22)' }}
         >
           <ArrowUp size={15} className="text-white" />
         </button>
       )}
 
-      {/* ── Coming Soon toast ── */}
+      {/* Coming Soon toast */}
       <AnimatePresence>
         {comingSoon && (
           <motion.div
@@ -847,16 +725,215 @@ function ResultsContent() {
             animate={{ opacity: 1, y: 0,  scale: 1    }}
             exit={{    opacity: 0, y: 8,  scale: 0.96 }}
             transition={{ duration: 0.22, ease: [0.34, 1.56, 0.64, 1] }}
-            className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 flex items-center gap-2.5 px-5 py-3 rounded-full text-white text-[12px] font-bold"
-            style={{
-              background: '#1A1A1A',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.28)',
-              whiteSpace: 'nowrap',
-            }}
+            className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 flex items-center gap-2.5 px-5 py-3 rounded-full text-white text-[12px] font-bold"
+            style={{ background: '#1A1A1A', boxShadow: '0 8px 32px rgba(0,0,0,0.28)', whiteSpace: 'nowrap' }}
           >
             <span style={{ fontSize: 15 }}>🚀</span>
             Coming soon
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Quick View Modal */}
+      <AnimatePresence>
+        {quickViewProduct && (
+          <>
+            {/* Backdrop */}
+            <div
+              onClick={() => setQuickViewProduct(null)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 999999,
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
+            />
+            {/* Modal */}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px',
+                zIndex: 1000000,
+                pointerEvents: 'none',
+              }}
+            >
+              <div
+                style={{
+                  width: 'min(100%, 420px)',
+                  height: 'min(100%, 80vh)',
+                  aspectRatio: '4/5',
+                  backgroundColor: '#F2EDE4',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  pointerEvents: 'auto',
+                  zIndex: 1000001,
+                }}
+              >
+                {/* Image Container */}
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'hidden',
+                }}>
+                  {quickViewProduct.imageUrl ? (
+                    <Image
+                      src={quickViewProduct.imageUrl}
+                      alt={quickViewProduct.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(145deg, #EDE8E0 0%, #DDD5C6 100%)',
+                    }}>
+                      <Zap size={60} style={{ color: '#9B8877', opacity: 0.4 }} />
+                    </div>
+                  )}
+                  
+                  {/* Gradient overlay - subtle */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.1) 100%)',
+                  }} />
+
+                  {/* Close button - top right */}
+                  <button
+                    onClick={() => setQuickViewProduct(null)}
+                    style={{
+                      position: 'absolute',
+                      top: '16px',
+                      right: '16px',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: 'none',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    }}
+                  >
+                    <X size={18} style={{ color: '#1A1A1A' }} />
+                  </button>
+
+                  {/* Bookmark button - bottom left */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        setAuthOpen(true);
+                      } else {
+                        handleBookmark(quickViewProduct.id);
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '16px',
+                      left: '16px',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    }}
+                  >
+                    {quickViewProduct.isBookmarked ? (
+                      <BookmarkCheck size={18} style={{ color: '#C4A882' }} />
+                    ) : (
+                      <Bookmark size={18} style={{ color: '#1A1A1A' }} />
+                    )}
+                  </button>
+
+                  {/* Discount badge - top left */}
+                  {quickViewProduct.originalPrice && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '16px',
+                      left: '16px',
+                    }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 900,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        padding: '6px 12px',
+                        borderRadius: '50px',
+                        backgroundColor: 'rgba(26, 26, 26, 0.85)',
+                        color: 'white',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      }}>
+                        -{Math.round((1 - quickViewProduct.price / quickViewProduct.originalPrice) * 100)}%
+                      </span>
+                    </div>
+                  )}
+
+                  {/* View Details button - bottom right */}
+                  <button
+                    onClick={() => {
+                      localStorage.setItem(`browseai:product:${quickViewProduct.id}`, JSON.stringify(quickViewProduct));
+                      router.push(`/product/${quickViewProduct.id}`);
+                      setQuickViewProduct(null);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '16px',
+                      right: '16px',
+                      padding: '8px 16px',
+                      fontSize: '11px',
+                      fontWeight: 900,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      borderRadius: '50px',
+                      backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                      color: 'white',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                    }}
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </AnimatePresence>
     </div>
