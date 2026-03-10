@@ -24,6 +24,11 @@ export interface PaginatedProducts {
   has_next: boolean;
 }
 
+export interface SearchResult extends PaginatedProducts {
+  displayText: string;
+  suggestedFilters: string[];
+}
+
 // Legacy types — kept for ChatPanel component compatibility
 export interface ChatMessage {
   id: string;

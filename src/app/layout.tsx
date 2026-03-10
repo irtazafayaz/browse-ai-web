@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/lib/Providers";
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "Browse AI — Shop with words, not filters",
@@ -16,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`antialiased ${playfair.variable}`}>
         <Providers>
           {children}
         </Providers>

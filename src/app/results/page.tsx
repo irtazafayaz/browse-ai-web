@@ -13,11 +13,12 @@ import Logo from '@/components/Logo';
 import FilterDrawer from '@/components/FilterDrawer';
 import AuthModal from '@/components/AuthModal';
 import { Product, SearchFilters } from '@/lib/types';
-import { getProducts, searchByImage, toggleBookmark } from '@/lib/api';
+import { getProducts, searchProducts, searchByImage, toggleBookmark } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 
 type SearchMode = 'text' | 'image';
 type SortMode   = 'match' | 'price-asc' | 'price-desc' | 'trending';
+type Gender     = 'Women' | 'Men';
 
 function sortProducts(products: Product[], sort: SortMode): Product[] {
   const arr = [...products];
@@ -99,6 +100,13 @@ function ResultsContent() {
   const [filters, setFilters]       = useState<SearchFilters>({});
   const [filterOpen, setFilterOpen] = useState(false);
   const [authOpen, setAuthOpen]     = useState(false);
+  const [gender, setGender]         = useState<Gender>('Women');
+  const [comingSoon, setComingSoon] = useState(false);
+
+  const showComingSoon = () => {
+    setComingSoon(true);
+    setTimeout(() => setComingSoon(false), 2200);
+  };
 
   /* ── Cart ── */
   const [cartCount, setCartCount] = useState(0);
@@ -149,11 +157,15 @@ function ResultsContent() {
   ) => {
     if (reset) setLoading(true); else setLoadingMore(true);
     try {
-      const r = await getProducts({
-        q: q || undefined, page: pageNum,
-        brand: f.brand, min_price: f.minPrice, max_price: f.maxPrice,
-        tags: f.tags?.length ? f.tags : undefined,
-      });
+      // When a query is present → BrowseBy AI API (POST /api/products/search/)
+      // When browsing with no query → MongoDB product list with filters
+      const r = q
+        ? await searchProducts(q, pageNum)
+        : await getProducts({
+            page: pageNum,
+            brand: f.brand, min_price: f.minPrice, max_price: f.maxPrice,
+            tags: f.tags?.length ? f.tags : undefined,
+          });
       setTotal(r.total); setPage(pageNum); setHasNext(r.has_next);
       if (reset) setRawProducts(r.products);
       else       setRawProducts(prev => [...prev, ...r.products]);
@@ -401,11 +413,11 @@ function ResultsContent() {
                 />
               </button>
 
-              {/* Camera icon — springs when switching to image mode */}
+              {/* Camera icon — coming soon */}
               <button
                 type="button"
-                onClick={() => { fileInputRef.current?.click(); popIcon('image'); }}
-                title="Image search"
+                onClick={() => { showComingSoon(); popIcon('image'); }}
+                title="Image search (coming soon)"
                 className={`shrink-0 active:scale-90 ${iconPopping === 'image' ? 'animate-icon-pop' : ''}`}
                 style={{ marginRight: 14, lineHeight: 0 }}
               >
@@ -600,6 +612,27 @@ function ResultsContent() {
         className="flex items-center gap-2 px-4 py-2.5"
         style={{ borderBottom: '1px solid rgba(212,196,168,0.2)' }}
       >
+        {/* Gender toggle */}
+        <div
+          className="flex rounded-full p-[3px] shrink-0"
+          style={{ background: 'rgba(0,0,0,0.06)' }}
+        >
+          {(['Women', 'Men'] as Gender[]).map(g => (
+            <button
+              key={g}
+              onClick={() => g === 'Men' ? showComingSoon() : setGender(g)}
+              className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-200"
+              style={{
+                background: gender === g ? '#1A1A1A' : 'transparent',
+                color: gender === g ? 'white' : '#9B9B9B',
+                boxShadow: gender === g ? '0 2px 6px rgba(0,0,0,0.2)' : 'none',
+              }}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+
         {/* Result count */}
         <div className="flex-1 min-w-0">
           {loading ? (
@@ -805,6 +838,27 @@ function ResultsContent() {
           <ArrowUp size={15} className="text-white" />
         </button>
       )}
+
+      {/* ── Coming Soon toast ── */}
+      <AnimatePresence>
+        {comingSoon && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0,  scale: 1    }}
+            exit={{    opacity: 0, y: 8,  scale: 0.96 }}
+            transition={{ duration: 0.22, ease: [0.34, 1.56, 0.64, 1] }}
+            className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 flex items-center gap-2.5 px-5 py-3 rounded-full text-white text-[12px] font-bold"
+            style={{
+              background: '#1A1A1A',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.28)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ fontSize: 15 }}>🚀</span>
+            Coming soon
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

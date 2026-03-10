@@ -98,13 +98,29 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      getProduct(id),
-      getProducts(),
-    ]).then(([prod, all]) => {
+
+    const cached = localStorage.getItem(`browseai:product:${id}`);
+    if (cached) {
+      try {
+        const prod = JSON.parse(cached) as Product;
+        setProduct(prod);
+        setBookmarked(prod.isBookmarked ?? false);
+        setLoading(false);
+        // load related products in background
+        getProducts({ page: 1 }).then(all => {
+          const rel = all.products
+            .filter((p: Product) => p.id !== id && p.tags.some((t: string) => prod.tags?.includes(t)))
+            .slice(0, 6);
+          setRelatedProducts(rel);
+        }).catch(() => {});
+        return;
+      } catch { /* fall through */ }
+    }
+
+    Promise.all([getProduct(id), getProducts()]).then(([prod, all]) => {
       setProduct(prod);
       setBookmarked(prod?.isBookmarked ?? false);
-      const rel = (all as Product[])
+      const rel = all.products
         .filter((p: Product) => p.id !== id && p.tags.some((t: string) => prod?.tags?.includes(t)))
         .slice(0, 6);
       setRelatedProducts(rel);
