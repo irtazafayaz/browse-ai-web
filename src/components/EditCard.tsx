@@ -48,7 +48,7 @@ export default function EditCard({ edit, onTap }: Props) {
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(to bottom, transparent 35%, rgba(0,0,0,${hovered ? 0.76 : 0.52}) 100%)`,
+          background: `linear-gradient(to bottom, transparent 35%, rgba(10,10,9,${hovered ? 0.78 : 0.54}) 100%)`,
           transition: "background 0.3s ease",
         }}
       />
@@ -64,7 +64,7 @@ export default function EditCard({ edit, onTap }: Props) {
           boxShadow: hovered ? "0 4px 12px rgba(0,0,0,0.12)" : "none",
         }}
       >
-        <span className="text-[10px] font-bold text-[#1A1A1A] tracking-wide uppercase">
+        <span className="text-[10px] font-bold tracking-wide uppercase" style={{ color: "#7A9E74" }}>
           {edit.tag}
         </span>
       </div>
@@ -81,17 +81,18 @@ export default function EditCard({ edit, onTap }: Props) {
           {edit.label}
         </span>
         <div
-          className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0"
+          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
           style={{
+            background: hovered ? "#7A9E74" : "white",
             opacity: hovered ? 1 : 0,
             transform: hovered
               ? "scale(1) rotate(0deg)"
               : "scale(0.6) rotate(-45deg)",
             transition:
-              "opacity 0.25s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+              "opacity 0.25s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.2s ease",
           }}
         >
-          <ArrowRight size={14} className="text-[#1A1A1A]" />
+          <ArrowRight size={14} style={{ color: "white" }} />
         </div>
       </div>
     </div>
