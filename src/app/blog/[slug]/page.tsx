@@ -3,11 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import PageShell from "@/components/PageShell";
-import { BLOG_POSTS, getPostBySlug, formatDate } from "@/lib/blog";
+import { getPost, getPosts, formatDate } from "@/lib/blog";
 
-export function generateStaticParams() {
-  return BLOG_POSTS.map((p) => ({ slug: p.slug }));
-}
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
@@ -15,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPost(slug);
   if (!post) return { title: "Post not found" };
   return {
     title: `${post.title} — Browse AI Blog`,
@@ -30,16 +28,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPost({
+export default async function BlogPostPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const [post, allPosts] = await Promise.all([getPost(slug), getPosts()]);
+
   if (!post) notFound();
 
-  const related = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 2);
+  const related = allPosts.filter((p) => p.slug !== post.slug).slice(0, 2);
 
   return (
     <PageShell>
