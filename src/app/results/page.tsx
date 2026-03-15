@@ -22,10 +22,14 @@ type Gender = "Women" | "Men";
 function sortProducts(products: Product[], sort: SortMode): Product[] {
   const arr = [...products];
   switch (sort) {
-    case "price-asc":  return arr.sort((a, b) => a.price - b.price);
-    case "price-desc": return arr.sort((a, b) => b.price - a.price);
-    case "trending":   return arr.sort((a, b) => b.id.localeCompare(a.id));
-    default:           return arr;
+    case "price-asc":
+      return arr.sort((a, b) => a.price - b.price);
+    case "price-desc":
+      return arr.sort((a, b) => b.price - a.price);
+    case "trending":
+      return arr.sort((a, b) => b.id.localeCompare(a.id));
+    default:
+      return arr;
   }
 }
 
@@ -37,27 +41,29 @@ function ResultsContent() {
   const { user } = useAuth();
   const initialQuery = searchParams.get("q") ?? "";
 
-  const [inputValue, setInputValue]     = useState(initialQuery);
+  const [inputValue, setInputValue] = useState(initialQuery);
   const [inputFocused, setInputFocused] = useState(false);
-  const [query, setQuery]               = useState(initialQuery);
-  const [phIdx, setPhIdx]               = useState(0);
-  const [phVisible, setPhVisible]       = useState(true);
+  const [query, setQuery] = useState(initialQuery);
+  const [phIdx, setPhIdx] = useState(0);
+  const [phVisible, setPhVisible] = useState(true);
 
-  const [rawProducts, setRawProducts]   = useState<Product[]>([]);
-  const [total, setTotal]               = useState(0);
-  const [page, setPage]                 = useState(1);
-  const [hasNext, setHasNext]           = useState(false);
-  const [loading, setLoading]           = useState(false);
-  const [loadingMore, setLoadingMore]   = useState(false);
+  const [rawProducts, setRawProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const [sort, setSort]               = useState<SortMode>("match");
-  const [filters, setFilters]         = useState<SearchFilters>({});
-  const [filterOpen, setFilterOpen]   = useState(false);
-  const [authOpen, setAuthOpen]       = useState(false);
-  const [gender, setGender]           = useState<Gender>("Women");
-  const [comingSoon, setComingSoon]   = useState(false);
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [showScrollTop, setShowScrollTop]       = useState(false);
+  const [sort, setSort] = useState<SortMode>("match");
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [gender, setGender] = useState<Gender>("Women");
+  const [comingSoon, setComingSoon] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
+    null,
+  );
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,7 +76,9 @@ function ResultsContent() {
   useEffect(() => {
     if (quickViewProduct) {
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = "unset"; };
+      return () => {
+        document.body.style.overflow = "unset";
+      };
     }
   }, [quickViewProduct]);
 
@@ -92,9 +100,9 @@ function ResultsContent() {
     return () => clearInterval(id);
   }, [inputFocused, inputValue]);
 
-  const displayProducts   = sortProducts(rawProducts, sort);
-  const bookmarkCount     = rawProducts.filter((p) => p.isBookmarked).length;
-  const hasResults        = loading || rawProducts.length > 0;
+  const displayProducts = sortProducts(rawProducts, sort);
+  const bookmarkCount = rawProducts.filter((p) => p.isBookmarked).length;
+  const hasResults = loading || rawProducts.length > 0;
   const activeFilterCount = [
     filters.brand,
     filters.minPrice != null || filters.maxPrice != null ? "1" : null,
@@ -113,7 +121,9 @@ function ResultsContent() {
         setHasNext(r.has_next);
         if (reset) setRawProducts(r.products);
         else setRawProducts((prev) => [...prev, ...r.products]);
-      } catch { /* silent */ } finally {
+      } catch {
+        /* silent */
+      } finally {
         if (reset) setLoading(false);
         else setLoadingMore(false);
       }
@@ -129,16 +139,21 @@ function ResultsContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const prevQueryRef   = useRef(query);
+  const prevQueryRef = useRef(query);
   const prevFiltersRef = useRef(filters);
   useEffect(() => {
     const qChanged = query !== prevQueryRef.current;
-    const fChanged = JSON.stringify(filters) !== JSON.stringify(prevFiltersRef.current);
-    prevQueryRef.current   = query;
+    const fChanged =
+      JSON.stringify(filters) !== JSON.stringify(prevFiltersRef.current);
+    prevQueryRef.current = query;
     prevFiltersRef.current = filters;
     if (qChanged || fChanged) {
       if (query) fetchText(query, filters, 1, true);
-      else { setRawProducts([]); setTotal(0); setHasNext(false); }
+      else {
+        setRawProducts([]);
+        setTotal(0);
+        setHasNext(false);
+      }
     }
   }, [query, filters, fetchText]);
 
@@ -167,10 +182,21 @@ function ResultsContent() {
 
   const handleBookmark = useCallback(
     (id: string) => {
-      if (!user) { setAuthOpen(true); return; }
-      setRawProducts((prev) => prev.map((p) => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p));
+      if (!user) {
+        setAuthOpen(true);
+        return;
+      }
+      setRawProducts((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p,
+        ),
+      );
       toggleBookmark(id).catch(() =>
-        setRawProducts((prev) => prev.map((p) => p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p)),
+        setRawProducts((prev) =>
+          prev.map((p) =>
+            p.id === id ? { ...p, isBookmarked: !p.isBookmarked } : p,
+          ),
+        ),
       );
     },
     [user],
@@ -192,9 +218,13 @@ function ResultsContent() {
   };
 
   const searchPillProps = {
-    inputFocused, setInputFocused,
-    inputValue, setInputValue,
-    phIdx, phVisible, loading,
+    inputFocused,
+    setInputFocused,
+    inputValue,
+    setInputValue,
+    phIdx,
+    phVisible,
+    loading,
     onSubmit: handleTextSearch,
     onClear: clearAll,
     onCameraClick: showComingSoonToast,
@@ -206,7 +236,7 @@ function ResultsContent() {
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       <header
-        className="sticky top-0 z-30 flex items-center justify-between px-4"
+        className="sticky top-0 z-30 flex items-center px-4"
         style={{
           height: NAV_H,
           background: "rgba(250,250,248,0.97)",
@@ -215,18 +245,31 @@ function ResultsContent() {
           borderBottom: "1px solid rgba(212,196,168,0.25)",
         }}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 flex-1">
           <button
             onClick={() => router.push("/")}
             className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all"
           >
             <ArrowLeft size={15} className="text-[#1A1A1A]" />
           </button>
-          <Logo size="xs" />
+          <Logo size="xs" onClick={() => router.push("/")} />
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex-1 flex justify-center px-2 min-w-0">
+          <span
+            className="text-[12px] italic truncate max-w-[160px]"
+            style={{ color: "#58574F" }}
+          >
+            {query}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 flex-1 justify-end">
           {bookmarkCount > 0 && (
-            <div className="flex items-center gap-1.5 text-white text-[11px] font-semibold rounded-full px-2.5 py-1" style={{ background: "#1A1A1A" }}>
+            <div
+              className="flex items-center gap-1.5 text-white text-[11px] font-semibold rounded-full px-2.5 py-1"
+              style={{ background: "#1A1A1A" }}
+            >
               <BookmarkCheck size={11} />
               {bookmarkCount}
             </div>
@@ -239,16 +282,28 @@ function ResultsContent() {
               title={user.email}
             >
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                <img
+                  src={user.avatar_url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                [user.first_name, user.last_name].filter(Boolean).map((n) => n[0]).join("").toUpperCase() || user.email[0].toUpperCase()
+                [user.first_name, user.last_name]
+                  .filter(Boolean)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase() || user.email[0].toUpperCase()
               )}
             </button>
           ) : (
             <button
               onClick={() => setAuthOpen(true)}
               className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all hover:bg-[#1A1A1A] hover:text-white active:scale-95"
-              style={{ border: "1.5px solid #1A1A1A", color: "#1A1A1A", letterSpacing: "0.08em" }}
+              style={{
+                border: "1.5px solid #1A1A1A",
+                color: "#1A1A1A",
+                letterSpacing: "0.08em",
+              }}
             >
               Sign in
             </button>
@@ -288,34 +343,82 @@ function ResultsContent() {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col items-center justify-center gap-4 py-28"
             >
-              <motion.div animate={{ y: [0, -10, 0], rotate: [0, -6, 6, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} className="text-5xl select-none">
+              <motion.div
+                animate={{ y: [0, -10, 0], rotate: [0, -6, 6, 0] }}
+                transition={{
+                  duration: 3.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="text-5xl select-none"
+              >
                 🔍
               </motion.div>
               <div className="text-center">
-                <p className="font-black text-[#1A1A1A] text-base" style={{ letterSpacing: "-0.02em" }}>No results found</p>
-                <p className="text-sm max-w-xs mt-1" style={{ color: "#9B9B9B" }}>Try a different search or clear your filters.</p>
+                <p
+                  className="font-black text-[#1A1A1A] text-base"
+                  style={{ letterSpacing: "-0.02em" }}
+                >
+                  No results found
+                </p>
+                <p
+                  className="text-sm max-w-xs mt-1"
+                  style={{ color: "#9B9B9B" }}
+                >
+                  Try a different search or clear your filters.
+                </p>
               </div>
               {activeFilterCount > 0 && (
-                <motion.button initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.28, type: "spring", stiffness: 400, damping: 25 }} whileTap={{ scale: 0.95 }} onClick={() => setFilters({})} className="px-4 py-2 text-sm font-bold text-[#1A1A1A] rounded-full hover:bg-[#E8E0D4]" style={{ border: "1.5px solid #D4C4A8" }}>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    delay: 0.28,
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25,
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setFilters({})}
+                  className="px-4 py-2 text-sm font-bold text-[#1A1A1A] rounded-full hover:bg-[#E8E0D4]"
+                  style={{ border: "1.5px solid #D4C4A8" }}
+                >
                   Clear filters
                 </motion.button>
               )}
             </motion.div>
           ) : (
             <>
-              <MasonryGrid products={displayProducts} onBookmark={handleBookmark} onMoreLikeThis={() => {}} onQuickView={setQuickViewProduct} />
+              <MasonryGrid
+                products={displayProducts}
+                onBookmark={handleBookmark}
+                onMoreLikeThis={() => {}}
+                onQuickView={setQuickViewProduct}
+              />
               <div ref={sentinelRef} className="h-4" />
               {loadingMore && (
                 <div className="flex justify-center py-5">
                   <div className="flex gap-1.5">
                     {[0, 1, 2].map((i) => (
-                      <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "#7A9E74", animationDelay: `${i * 150}ms` }} />
+                      <span
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full animate-bounce"
+                        style={{
+                          background: "#7A9E74",
+                          animationDelay: `${i * 150}ms`,
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
               )}
               {!hasNext && !loadingMore && rawProducts.length > 0 && (
-                <p className="text-center text-[11px] py-6 font-medium" style={{ color: "#CCCCCC" }}>All {total.toLocaleString()} results shown</p>
+                <p
+                  className="text-center text-[11px] py-6 font-medium"
+                  style={{ color: "#CCCCCC" }}
+                >
+                  All {total.toLocaleString()} results shown
+                </p>
               )}
             </>
           )}
@@ -326,22 +429,50 @@ function ResultsContent() {
         {!hasResults ? (
           <motion.div
             key="centered"
-            style={{ position: "fixed", top: NAV_H, bottom: 0, left: 0, right: 0, zIndex: 20, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 16px", pointerEvents: "none" }}
+            style={{
+              position: "fixed",
+              top: NAV_H,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 20,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 16px",
+              pointerEvents: "none",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.15 } }}
           >
-            <p className="text-[13px] font-medium mb-4 pointer-events-none select-none" style={{ color: "#BBBBBB" }}>
+            <p
+              className="text-[13px] font-medium mb-4 pointer-events-none select-none"
+              style={{ color: "#BBBBBB" }}
+            >
               Describe what you&apos;re looking for
             </p>
-            <div className="relative w-full pointer-events-auto" style={{ maxWidth: 640 }}>
+            <div
+              className="relative w-full pointer-events-auto"
+              style={{ maxWidth: 640 }}
+            >
               <SearchPill {...searchPillProps} />
             </div>
           </motion.div>
         ) : (
           <motion.div
             key="bottom"
-            style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 20, padding: "10px 16px 14px", background: "transparent", pointerEvents: "auto" }}
+            style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 20,
+              padding: "10px 16px 14px",
+              background: "transparent",
+              pointerEvents: "auto",
+            }}
             initial={{ y: 200, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 200, opacity: 0 }}
@@ -354,12 +485,34 @@ function ResultsContent() {
         )}
       </AnimatePresence>
 
-      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { e.target.value = ""; }} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          e.target.value = "";
+        }}
+      />
 
-      <FilterDrawer open={filterOpen} onClose={() => setFilterOpen(false)} filters={filters} onChange={setFilters} activeCount={activeFilterCount} />
+      <FilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        activeCount={activeFilterCount}
+      />
 
       {showScrollTop && (
-        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="fixed bottom-24 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-transform" style={{ background: "#0F0F0E", boxShadow: "0 4px 20px rgba(0,0,0,0.22)" }}>
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Back to top"
+          className="fixed bottom-24 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-transform"
+          style={{
+            background: "#0F0F0E",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.22)",
+          }}
+        >
           <ArrowUp size={15} className="text-white" />
         </button>
       )}
@@ -371,7 +524,11 @@ function ResultsContent() {
         onClose={() => setQuickViewProduct(null)}
         onBookmark={handleBookmark}
         onViewDetails={(id) => {
-          if (quickViewProduct) localStorage.setItem(`browseai:product:${id}`, JSON.stringify(quickViewProduct));
+          if (quickViewProduct)
+            localStorage.setItem(
+              `browseai:product:${id}`,
+              JSON.stringify(quickViewProduct),
+            );
           router.push(`/product/${id}`);
           setQuickViewProduct(null);
         }}
@@ -383,15 +540,26 @@ function ResultsContent() {
 }
 
 const LoadingDots = () => (
-  <div className="flex items-center justify-center" style={{ height: "100dvh", background: "#FAFAF8" }}>
+  <div
+    className="flex items-center justify-center"
+    style={{ height: "100dvh", background: "#FAFAF8" }}
+  >
     <div className="flex gap-1.5">
       {[0, 1, 2].map((i) => (
-        <span key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: "#7A9E74", animationDelay: `${i * 150}ms` }} />
+        <span
+          key={i}
+          className="w-2 h-2 rounded-full animate-bounce"
+          style={{ background: "#7A9E74", animationDelay: `${i * 150}ms` }}
+        />
       ))}
     </div>
   </div>
 );
 
 export default function ResultsPage() {
-  return <Suspense fallback={<LoadingDots />}><ResultsContent /></Suspense>;
+  return (
+    <Suspense fallback={<LoadingDots />}>
+      <ResultsContent />
+    </Suspense>
+  );
 }

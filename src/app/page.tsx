@@ -29,8 +29,8 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [edits, setEdits] = useState<Edit[]>([]);
   const [authOpen, setAuthOpen] = useState(false);
-  const statsReveal  = useScrollReveal(0.1);
-  const editsReveal  = useScrollReveal(0.04);
+  const statsReveal = useScrollReveal(0.1);
+  const editsReveal = useScrollReveal(0.04);
   const brandsReveal = useScrollReveal(0.06);
 
   const heroTextRef = useRef<HTMLDivElement>(null);
@@ -45,7 +45,10 @@ export default function LandingPage() {
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(rafId); };
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const signInRef = useRef<HTMLButtonElement>(null);
@@ -67,11 +70,15 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    getEdits().then(setEdits).catch(() => {});
+    getEdits()
+      .then(setEdits)
+      .catch(() => {});
   }, []);
 
-  const handleSearch  = (text: string) => router.push(`/results?q=${encodeURIComponent(text)}`);
-  const handleEditTap = (edit: Edit)   => router.push(`/results?q=${encodeURIComponent(edit.label)}`);
+  const handleSearch = (text: string) =>
+    router.push(`/results?q=${encodeURIComponent(text)}`);
+  const handleEditTap = (edit: Edit) =>
+    router.push(`/results?q=${encodeURIComponent(edit.label)}`);
 
   return (
     <div className="relative bg-[#FAFAF8] overflow-x-hidden">
@@ -84,13 +91,20 @@ export default function LandingPage() {
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-6 max-w-7xl mx-auto">
         <div
           className="transition-all duration-700"
-          style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(-12px)" }}
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? "translateY(0)" : "translateY(-12px)",
+          }}
         >
           <Logo size="md" />
         </div>
         <div
           className="flex items-center gap-3 transition-all duration-700"
-          style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(-12px)", transitionDelay: "80ms" }}
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? "translateY(0)" : "translateY(-12px)",
+            transitionDelay: "80ms",
+          }}
         >
           {user ? (
             <button
@@ -100,10 +114,17 @@ export default function LandingPage() {
               title={user.email}
             >
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                <img
+                  src={user.avatar_url}
+                  alt=""
+                  className="w-full h-full rounded-full object-cover"
+                />
               ) : (
                 [user.first_name, user.last_name]
-                  .filter(Boolean).map((n) => n[0]).join("").toUpperCase() || user.email[0].toUpperCase()
+                  .filter(Boolean)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase() || user.email[0].toUpperCase()
               )}
             </button>
           ) : (
@@ -124,7 +145,12 @@ export default function LandingPage() {
               }}
             >
               <span className="txt-a">Sign in</span>
-              <span className="txt-b" style={{ background: "#0F0F0E", color: "white" }}>Sign in</span>
+              <span
+                className="txt-b"
+                style={{ background: "#0F0F0E", color: "white" }}
+              >
+                Sign in
+              </span>
             </button>
           )}
         </div>
@@ -135,7 +161,11 @@ export default function LandingPage() {
           <div ref={heroTextRef} style={{ willChange: "transform" }}>
             <div
               className="mb-7 transition-all duration-700"
-              style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(-8px)", transitionDelay: "150ms" }}
+              style={{
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? "translateY(0)" : "translateY(-8px)",
+                transitionDelay: "150ms",
+              }}
             >
               <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 animate-pulse-glow">
                 <Sparkles size={12} style={{ color: "#7A9E74" }} />
@@ -149,9 +179,16 @@ export default function LandingPage() {
               className="font-cormorant font-semibold text-[#0F0F0E] leading-[0.90] tracking-[-0.02em] mb-7"
               style={{ fontSize: "clamp(3.6rem, 7.5vw, 6.4rem)" }}
             >
-              <span className="block" style={{ fontStyle: "normal" }}><CharReveal text="Shop with" baseDelay={180} /></span>
-              <span className="block" style={{ fontStyle: "italic" }}><CharReveal text="words," baseDelay={460} /></span>
-              <span className="block" style={{ fontStyle: "normal", color: "#9B9B94" }}>
+              <span className="block" style={{ fontStyle: "normal" }}>
+                <CharReveal text="Shop with" baseDelay={180} />
+              </span>
+              <span className="block" style={{ fontStyle: "italic" }}>
+                <CharReveal text="words," baseDelay={460} />
+              </span>
+              <span
+                className="block"
+                style={{ fontStyle: "normal", color: "#9B9B94" }}
+              >
                 <CharReveal text="not filters." baseDelay={700} />
               </span>
             </h1>
@@ -183,10 +220,19 @@ export default function LandingPage() {
                     transition: `opacity 0.6s ease ${900 + i * 80}ms, transform 0.6s cubic-bezier(0.19,1,0.22,1) ${900 + i * 80}ms`,
                   }}
                 >
-                  <Image src={url} alt="Fashion" fill className="object-cover" sizes="130px" />
+                  <Image
+                    src={url}
+                    alt="Fashion"
+                    fill
+                    className="object-cover"
+                    sizes="130px"
+                  />
                   <div
                     className="absolute inset-0"
-                    style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 100%)" }}
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 100%)",
+                    }}
                   />
                 </div>
               ))}
@@ -205,7 +251,11 @@ export default function LandingPage() {
 
           <div
             className="transition-all duration-700"
-            style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(28px)", transitionDelay: "420ms" }}
+            style={{
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? "translateY(0)" : "translateY(28px)",
+              transitionDelay: "420ms",
+            }}
           >
             <CardTilt>
               <HeroSearchCard onSubmit={handleSearch} />
@@ -220,10 +270,32 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
-            <StatItem value="500+"  label="Brands"      delay={statsReveal.visible ? 0   : 9999} counterTarget={500} counterSuffix="+" />
-            <StatItem value="50K+"  label="Products"    delay={statsReveal.visible ? 120 : 9999} counterTarget={50}  counterSuffix="K+" />
-            <StatItem value="< 2s"  label="Search time" delay={statsReveal.visible ? 240 : 9999} />
-            <StatItem value="100%"  label="Curated"     delay={statsReveal.visible ? 360 : 9999} counterTarget={100} counterSuffix="%" />
+            <StatItem
+              value="500+"
+              label="Brands"
+              delay={statsReveal.visible ? 0 : 9999}
+              counterTarget={500}
+              counterSuffix="+"
+            />
+            <StatItem
+              value="50K+"
+              label="Products"
+              delay={statsReveal.visible ? 120 : 9999}
+              counterTarget={50}
+              counterSuffix="K+"
+            />
+            <StatItem
+              value="< 2s"
+              label="Search time"
+              delay={statsReveal.visible ? 240 : 9999}
+            />
+            <StatItem
+              value="100%"
+              label="Curated"
+              delay={statsReveal.visible ? 360 : 9999}
+              counterTarget={100}
+              counterSuffix="%"
+            />
           </div>
         </div>
       </section>
@@ -240,7 +312,11 @@ export default function LandingPage() {
         ref={brandsReveal.ref}
       >
         <div className="max-w-7xl mx-auto">
-          <ScrollHeading eyebrow="Our brands" title="Pakistan's finest fashion" visible={brandsReveal.visible} />
+          <ScrollHeading
+            eyebrow="Our brands"
+            title="Pakistan's finest fashion"
+            visible={brandsReveal.visible}
+          />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-4 gap-y-10">
             {BRAND_LIST.map((brand, i) => (
               <BrandCard
@@ -261,10 +337,18 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10">
-            <ScrollHeading eyebrow="Curated edits" title="Trending right now" light visible={editsReveal.visible} />
+            <ScrollHeading
+              eyebrow="Curated edits"
+              title="Trending right now"
+              light
+              visible={editsReveal.visible}
+            />
             <span
               className="text-xs text-[#666] font-semibold uppercase tracking-widest hidden md:block"
-              style={{ opacity: editsReveal.visible ? 1 : 0, transition: "opacity 0.7s 0.4s" }}
+              style={{
+                opacity: editsReveal.visible ? 1 : 0,
+                transition: "opacity 0.7s 0.4s",
+              }}
             >
               Updated weekly
             </span>
@@ -276,7 +360,9 @@ export default function LandingPage() {
                 className="transition-all duration-700"
                 style={{
                   opacity: editsReveal.visible ? 1 : 0,
-                  transform: editsReveal.visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.96)",
+                  transform: editsReveal.visible
+                    ? "translateY(0) scale(1)"
+                    : "translateY(40px) scale(0.96)",
                   transitionDelay: `${i * 65}ms`,
                 }}
               >
@@ -290,10 +376,14 @@ export default function LandingPage() {
       <footer className="relative z-10 border-t border-[#E6E2DA] py-8 px-6 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Logo size="sm" />
-            <span className="text-sm text-[#AAAAAA]">· Fashion discovery, reimagined</span>
+            <Logo size="xs" />
+            <span className="text-sm text-[#AAAAAA]">
+              · Fashion discovery, reimagined
+            </span>
           </div>
-          <span className="text-xs text-[#AAAAAA]">© 2025 Browse AI. All rights reserved.</span>
+          <span className="text-xs text-[#AAAAAA]">
+            © 2025 Browse AI. All rights reserved.
+          </span>
         </div>
       </footer>
     </div>
