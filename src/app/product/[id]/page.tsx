@@ -46,14 +46,14 @@ function RelatedCard({ product, onClick }: { product: Product; onClick: () => vo
         {discount && (
           <span
             className="absolute top-2 left-2 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5"
-            style={{ background: '#1A1A1A', color: 'white' }}
+            style={{ background: '#7A9E74', color: 'white' }}
           >
             -{discount}%
           </span>
         )}
       </div>
       <div className="pt-2 px-0.5">
-        <p className="text-[8px] font-black tracking-[0.18em] uppercase" style={{ color: '#8B7355' }}>
+        <p className="text-[8px] font-black tracking-[0.18em] uppercase" style={{ color: '#7A9E74' }}>
           {product.brand}
         </p>
         <p className="text-[11px] font-semibold text-[#1A1A1A] leading-snug mt-0.5 line-clamp-1">
@@ -146,10 +146,10 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#F2EDE4' }}>
+      <div className="flex h-screen items-center justify-center" style={{ background: '#FAFAF8' }}>
         <div className="flex gap-2 items-center">
           {[0, 1, 2].map(i => (
-            <span key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#C4A882', animationDelay: `${i * 150}ms` }} />
+            <span key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#7A9E74', animationDelay: `${i * 150}ms` }} />
           ))}
         </div>
       </div>
@@ -158,10 +158,10 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#F2EDE4' }}>
+      <div className="flex h-screen items-center justify-center" style={{ background: '#FAFAF8' }}>
         <div className="text-center">
           <p className="font-black text-[#1A1A1A] text-lg">Product not found</p>
-          <button onClick={() => router.back()} className="mt-4 text-sm text-[#8B7355] underline">
+          <button onClick={() => router.back()} className="mt-4 text-sm text-[#7A9E74] underline">
             Go back
           </button>
         </div>
@@ -170,16 +170,16 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#F2EDE4' }}>
+    <div className="min-h-screen" style={{ background: '#FAFAF8' }}>
 
       {/* ── Sticky top bar ── */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-4 py-3"
         style={{
-          background: 'rgba(242,237,228,0.94)',
+          background: 'rgba(250,250,248,0.94)',
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
-          borderBottom: '1px solid rgba(212,196,168,0.3)',
+          borderBottom: '1px solid rgba(230,226,218,0.3)',
         }}
       >
         <button
@@ -227,7 +227,7 @@ export default function ProductDetailPage() {
               className="relative overflow-hidden"
               style={{
                 aspectRatio: '3/4',
-                background: '#EDE9E1',
+                background: '#EEF4EE',
                 opacity: imageLoaded ? 1 : 0,
                 transition: 'opacity 0.5s ease',
               }}
@@ -245,7 +245,7 @@ export default function ProductDetailPage() {
               {discount && (
                 <div
                   className="absolute top-4 left-4 text-[10px] font-black tracking-widest uppercase px-2.5 py-1"
-                  style={{ background: '#1A1A1A', color: 'white', letterSpacing: '0.12em' }}
+                  style={{ background: '#0F0F0E', color: 'white', letterSpacing: '0.12em' }}
                 >
                   -{discount}% OFF
                 </div>
@@ -264,8 +264,8 @@ export default function ProductDetailPage() {
                   className="relative overflow-hidden cursor-pointer flex-1"
                   style={{
                     aspectRatio: '3/4',
-                    background: '#EDE9E1',
-                    outline: i === 0 ? '2px solid #1A1A1A' : '2px solid transparent',
+                    background: '#EEF4EE',
+                    outline: i === 0 ? '2px solid #7A9E74' : '2px solid transparent',
                     outlineOffset: '1px',
                     transition: 'outline 0.15s ease',
                   }}
@@ -308,13 +308,13 @@ export default function ProductDetailPage() {
 
               <p
                 className="text-[10px] font-black tracking-[0.22em] uppercase mb-2"
-                style={{ color: '#8B7355' }}
+                style={{ color: '#7A9E74' }}
               >
                 {product.brand}
               </p>
               <h1
                 className="font-black text-[#1A1A1A] leading-[1.05] mb-4"
-                style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', letterSpacing: '-0.03em' }}
+                style={{ fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)', letterSpacing: '-0.02em', fontFamily: 'var(--font-cormorant), Georgia, serif', fontStyle: 'italic' }}
               >
                 {product.name}
               </h1>
@@ -334,7 +334,7 @@ export default function ProductDetailPage() {
                     </span>
                     <span
                       className="text-xs font-black px-2 py-0.5"
-                      style={{ background: '#1A1A1A', color: 'white', letterSpacing: '0.08em' }}
+                      style={{ background: '#0F0F0E', color: 'white', letterSpacing: '0.08em' }}
                     >
                       -{discount}%
                     </span>
@@ -348,7 +348,7 @@ export default function ProductDetailPage() {
                   <span
                     key={tag}
                     className="text-[10px] font-semibold px-2.5 py-1 capitalize"
-                    style={{ background: '#EDE9E1', color: '#6B6B6B' }}
+                    style={{ background: '#EEF4EE', color: '#58574F' }}
                   >
                     {tag}
                   </span>
@@ -367,13 +367,13 @@ export default function ProductDetailPage() {
               }}
             >
               {/* Divider */}
-              <div style={{ height: 1, background: 'rgba(212,196,168,0.5)' }} />
+              <div style={{ height: 1, background: 'rgba(230,226,218,0.5)' }} />
 
               {/* Size selector */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[11px] font-black tracking-[0.15em] uppercase text-[#1A1A1A]">Size</p>
-                  <button className="text-[10px] font-semibold text-[#8B7355] underline underline-offset-2">
+                  <button className="text-[10px] font-semibold text-[#7A9E74] underline underline-offset-2">
                     Size guide
                   </button>
                 </div>
@@ -384,9 +384,9 @@ export default function ProductDetailPage() {
                       onClick={() => setSelectedSize(size)}
                       className="w-10 h-10 text-[11px] font-bold transition-all duration-200 active:scale-95"
                       style={{
-                        background: selectedSize === size ? '#1A1A1A' : 'transparent',
+                        background: selectedSize === size ? '#7A9E74' : 'transparent',
                         color: selectedSize === size ? 'white' : '#1A1A1A',
-                        border: `1.5px solid ${selectedSize === size ? '#1A1A1A' : '#D0CCC4'}`,
+                        border: `1.5px solid ${selectedSize === size ? '#7A9E74' : '#D0CCC4'}`,
                       }}
                     >
                       {size}
@@ -432,7 +432,7 @@ export default function ProductDetailPage() {
                   disabled={!selectedSize}
                   className="w-full py-4 font-black text-sm tracking-[0.1em] uppercase flex items-center justify-center gap-2.5 transition-all duration-300 active:scale-[0.98]"
                   style={{
-                    background: addedToBag ? '#4A7C59' : selectedSize ? '#1A1A1A' : '#C0BDB6',
+                    background: addedToBag ? '#4D7A47' : selectedSize ? '#7A9E74' : '#C0BDB6',
                     color: 'white',
                     letterSpacing: '0.12em',
                     cursor: selectedSize ? 'pointer' : 'not-allowed',
@@ -468,15 +468,15 @@ export default function ProductDetailPage() {
               {/* AI suggestion strip */}
               <div
                 className="flex items-center gap-3 p-3.5"
-                style={{ background: '#EDE9E1', border: '1px solid rgba(196,168,130,0.3)' }}
+                style={{ background: '#EEF4EE', border: '1px solid rgba(122,158,116,0.25)' }}
               >
                 <div
                   className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center"
-                  style={{ background: '#1A1A1A' }}
+                  style={{ background: '#EEF4EE' }}
                 >
-                  <Sparkles size={11} style={{ color: '#C4A882' }} />
+                  <Sparkles size={11} style={{ color: '#7A9E74' }} />
                 </div>
-                <p className="text-[11px] font-medium text-[#6B6B6B] leading-snug">
+                <p className="text-[11px] font-medium text-[#58574F] leading-snug">
                   <span className="font-black text-[#1A1A1A]">Browse AI says: </span>
                   Pairs well with a fitted turtleneck and loafers for an elevated everyday look.
                 </p>
@@ -490,7 +490,7 @@ export default function ProductDetailPage() {
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-[#C4A882]" />
+                      <div className="w-1 h-1 rounded-full bg-[#7A9E74]" />
                       <span className="text-[11px] font-semibold text-[#1A1A1A]">{item.label}</span>
                       <span className="text-[11px] text-[#9B9B9B]">{item.sub}</span>
                     </div>
@@ -514,9 +514,9 @@ export default function ProductDetailPage() {
             }}
           >
             {/* Section header */}
-            <div className="flex items-end justify-between mb-5" style={{ borderBottom: '1px solid rgba(212,196,168,0.4)', paddingBottom: '12px' }}>
+            <div className="flex items-end justify-between mb-5" style={{ borderBottom: '1px solid rgba(230,226,218,0.4)', paddingBottom: '12px' }}>
               <div>
-                <p className="text-[9px] font-black tracking-[0.22em] uppercase mb-1" style={{ color: '#8B7355' }}>
+                <p className="text-[9px] font-black tracking-[0.22em] uppercase mb-1" style={{ color: '#7A9E74' }}>
                   You may also like
                 </p>
                 <h2 className="font-black text-[#1A1A1A] text-xl" style={{ letterSpacing: '-0.03em' }}>
@@ -525,7 +525,7 @@ export default function ProductDetailPage() {
               </div>
               <button
                 onClick={() => router.push('/results')}
-                className="flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase text-[#8B7355] hover:text-[#1A1A1A] transition-colors"
+                className="flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase text-[#7A9E74] hover:text-[#1A1A1A] transition-colors"
                 style={{ letterSpacing: '0.1em' }}
               >
                 View all <ArrowUpRight size={12} />

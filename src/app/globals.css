@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F2EDE4;
+  --background: #FAFAF8;
   --surface: #FFFFFF;
-  --primary: #1A1A1A;
-  --secondary: #6B6B6B;
-  --accent: #C4A882;
-  --accent2: #8B7355;
-  --divider: #E0DDD6;
-  --cream: #F2EDE4;
+  --primary: #0F0F0E;
+  --secondary: #58574F;
+  --accent: #7A9E74;
+  --accent2: #4D7A47;
+  --accent-muted: #B4CAB0;
+  --accent-warm: #B8925A;
+  --divider: #E6E2DA;
+  --cream: #FAFAF8;
 }
 
 html { scroll-behavior: smooth; }
@@ -21,7 +23,7 @@ body {
   overflow-x: hidden;
 }
 
-::selection { background: #1A1A1A; color: white; }
+::selection { background: #7A9E74; color: white; }
 
 .chat-scroll::-webkit-scrollbar { display: none; }
 .chat-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -169,7 +171,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: #1A1A1A;
+  background: #0F0F0E;
   transform: scale3d(0, 1, 1);
   transform-origin: left center;
   transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -180,9 +182,9 @@ body {
 .btn-fancy:hover { color: white; }
 .btn-fancy span { position: relative; z-index: 1; }
 
-/* ─── Gradient text (warm shimmer) ─── */
+/* ─── Gradient text (sage shimmer) ─── */
 .gradient-text {
-  background: linear-gradient(135deg, #8B7355 0%, #C4A882 45%, #8B7355 100%);
+  background: linear-gradient(135deg, #4D7A47 0%, #7A9E74 45%, #4D7A47 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -198,15 +200,15 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 .glass-dark {
-  background: rgba(26, 26, 26, 0.85);
+  background: rgba(17, 17, 16, 0.88);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
 /* ─── Pulse glow ─── */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(196,168,130,0.3); }
-  50%       { box-shadow: 0 0 0 8px rgba(196,168,130,0.05); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(122,158,116,0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(122,158,116,0.05); }
 }
 .animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
 
@@ -293,7 +295,7 @@ body {
   }
   50% {
     box-shadow: 0 6px 22px rgba(0,0,0,0.20), 0 14px 42px rgba(0,0,0,0.14),
-                0 0 0 1.5px rgba(196,168,130,0.20);
+                0 0 0 1.5px rgba(122,158,116,0.22);
   }
 }
 .animate-pill-breathe {
@@ -313,6 +315,11 @@ body {
 }
 .animate-ph-in {
   animation: phSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Editorial serif utility ─── */
+.font-cormorant {
+  font-family: var(--font-cormorant), 'Georgia', serif;
 }
 
 /* ─── Underline slide ─── */

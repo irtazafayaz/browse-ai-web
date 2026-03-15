@@ -28,7 +28,7 @@ function DiscountBadge({ pct }: { pct: number }) {
   return (
     <span
       className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
-      style={{ background: "#1A1A1A", color: "white", letterSpacing: "0.08em" }}
+      style={{ background: "#7A9E74", color: "white", letterSpacing: "0.08em" }}
     >
       -{pct}%
     </span>
@@ -130,7 +130,7 @@ export default function ProductCard({
             className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4"
             style={{
               background:
-                "linear-gradient(145deg, #EDE8E0 0%, #DDD5C6 60%, #D4C8B6 100%)",
+                "linear-gradient(145deg, #F0EDE8 0%, #E4E0D8 60%, #DCDAD2 100%)",
             }}
           >
             <div
@@ -140,11 +140,11 @@ export default function ProductCard({
                 backdropFilter: "blur(8px)",
               }}
             >
-              <Zap size={20} style={{ color: "#9B8877" }} />
+              <Zap size={20} style={{ color: "#7A9E74" }} />
             </div>
             <span
               className="text-[10.5px] font-semibold text-center leading-snug line-clamp-3"
-              style={{ color: "#9B8877", maxWidth: "80%" }}
+              style={{ color: "#7A9E74", maxWidth: "80%" }}
             >
               {product.name}
             </span>
@@ -157,7 +157,7 @@ export default function ProductCard({
                 className="absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(90deg, #EDE9E1 25%, #E4DDD3 50%, #EDE9E1 75%)",
+                    "linear-gradient(90deg, #F0EDE8 25%, #E8E4DC 50%, #F0EDE8 75%)",
                   backgroundSize: "200% 100%",
                   animation: "skeletonShimmer 1.6s ease-in-out infinite",
                 }}
@@ -206,7 +206,7 @@ export default function ProductCard({
           className="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center"
           style={{
             background: product.isBookmarked
-              ? "#1A1A1A"
+              ? "#7A9E74"
               : "rgba(255,255,255,0.90)",
             backdropFilter: "blur(10px)",
             transform: bookmarkPop
@@ -243,14 +243,14 @@ export default function ProductCard({
                 whileTap={{ scale: 0.93 }}
                 className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full whitespace-nowrap"
                 style={{
-                  background: "#1A1A1A",
+                  background: "#0F0F0E",
                   color: "white",
                   letterSpacing: "0.10em",
                   boxShadow: "0 4px 18px rgba(0,0,0,0.28)",
                   transition: "background 0.3s ease",
                 }}
               >
-                <Zap size={9} style={{ color: "#C4A882" }} />
+                <Zap size={9} style={{ color: "#7A9E74" }} />
                 Quick view
               </motion.button>
             </motion.div>
@@ -262,18 +262,18 @@ export default function ProductCard({
       <div className="px-1 pt-2 pb-0.5">
         <span
           className="block text-[8px] font-black tracking-[0.18em] uppercase truncate"
-          style={{ color: "#9B8060" }}
+          style={{ color: "#7A9E74" }}
         >
           {product.brand}
         </span>
         <span
-          className="block text-[11.5px] font-semibold leading-snug line-clamp-2 text-[#1A1A1A] mt-0.5"
+          className="block text-[11.5px] font-semibold leading-snug line-clamp-2 text-[#0F0F0E] mt-0.5"
           style={{ letterSpacing: "-0.01em" }}
         >
           {product.name}
         </span>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-[12.5px] font-black text-[#1A1A1A] tracking-tight">
+          <span className="text-[12.5px] font-black text-[#0F0F0E] tracking-tight">
             ${product.price}
           </span>
           {product.originalPrice && (
