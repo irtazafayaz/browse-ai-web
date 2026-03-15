@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
@@ -98,6 +99,31 @@ export default function LandingPage() {
         >
           <Logo size="md" />
         </div>
+
+        <div
+          className="hidden md:flex items-center gap-7 transition-all duration-700"
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? "translateY(0)" : "translateY(-12px)",
+            transitionDelay: "40ms",
+          }}
+        >
+          {[
+            { href: "/blog", label: "Blog" },
+            { href: "/about", label: "About" },
+            { href: "/faq", label: "FAQ" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="text-[11px] font-black uppercase tracking-[0.14em] transition-colors duration-200 hover:opacity-60"
+              style={{ color: "#0F0F0E" }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+
         <div
           className="flex items-center gap-3 transition-all duration-700"
           style={{
