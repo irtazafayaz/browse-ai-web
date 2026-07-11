@@ -68,7 +68,7 @@ export default function ProductCard({
           `browseai:product:${product.id}`,
           JSON.stringify(product),
         );
-        router.push(`/product/${product.id}`);
+        router.push(`/product/${encodeURIComponent(product.id)}`);
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

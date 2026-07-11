@@ -80,7 +80,7 @@ function useReveal(delay = 0) {
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const id = decodeURIComponent(params.id as string);
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -539,7 +539,10 @@ export default function ProductDetailPage() {
                 <RelatedCard
                   key={p.id}
                   product={p}
-                  onClick={() => router.push(`/product/${p.id}`)}
+                  onClick={() => {
+                    localStorage.setItem(`browseai:product:${p.id}`, JSON.stringify(p));
+                    router.push(`/product/${encodeURIComponent(p.id)}`);
+                  }}
                 />
               ))}
             </div>

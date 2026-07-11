@@ -527,7 +527,7 @@ function ResultsContent() {
               `browseai:product:${id}`,
               JSON.stringify(quickViewProduct),
             );
-          router.push(`/product/${id}`);
+          router.push(`/product/${encodeURIComponent(id)}`);
           setQuickViewProduct(null);
         }}
         isAuthed={!!user}
