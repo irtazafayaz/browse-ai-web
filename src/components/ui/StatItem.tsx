@@ -43,11 +43,11 @@ export default function StatItem({
     <div className="flex flex-col gap-2">
       <div className="overflow-hidden">
         <span
-          className="font-cormorant text-5xl md:text-6xl font-semibold text-[#0F0F0E] tracking-tight leading-none"
+          className="font-display text-5xl md:text-6xl text-[var(--ink)] tracking-tight leading-none"
           style={{
             display: "inline-block",
             animation: triggered
-              ? "charReveal 0.9s cubic-bezier(0.165,0.84,0.44,1) both"
+              ? "charReveal 0.7s cubic-bezier(0.4,0,0.2,1) both"
               : "none",
             opacity: triggered ? undefined : 0,
           }}
@@ -59,10 +59,10 @@ export default function StatItem({
         <span
           className="text-sm font-semibold uppercase tracking-widest"
           style={{
-            color: "#7A9E74",
+            color: "var(--accent)",
             display: "inline-block",
             animation: triggered
-              ? "charReveal 0.9s cubic-bezier(0.165,0.84,0.44,1) 80ms both"
+              ? "charReveal 0.7s cubic-bezier(0.4,0,0.2,1) 80ms both"
               : "none",
             opacity: triggered ? undefined : 0,
           }}

@@ -21,13 +21,13 @@ export default function ScrollProgressBar() {
       ref={barRef}
       style={{
         position: "fixed", top: 0, left: 0, zIndex: 9999,
-        height: "2.5px", width: "0%",
-        background: "linear-gradient(90deg, #7A9E74 0%, #4D7A47 50%, #7A9E74 100%)",
+        height: "4px", width: "0%",
+        background: "linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 50%, var(--accent) 100%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 2.5s linear infinite",
         pointerEvents: "none",
-        borderRadius: "0 2px 2px 0",
-        boxShadow: "0 0 8px rgba(122,158,116,0.5)",
+        borderRadius: 0,
+        borderBottom: "2px solid var(--ink)",
       }}
     />
   );

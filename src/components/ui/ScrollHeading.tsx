@@ -15,10 +15,10 @@ export default function ScrollHeading({
         <span
           className="text-[10px] font-black tracking-[0.28em] uppercase"
           style={{
-            color: "#7A9E74",
+            color: "var(--accent)",
             display: "inline-block",
             animation: visible
-              ? "eyebrowIn 0.7s cubic-bezier(0.165,0.84,0.44,1) both"
+              ? "eyebrowIn 0.5s cubic-bezier(0.4,0,0.2,1) both"
               : "none",
             opacity: visible ? undefined : 0,
           }}
@@ -27,11 +27,10 @@ export default function ScrollHeading({
         </span>
       </div>
       <h2
-        className="font-cormorant font-semibold leading-tight tracking-[-0.02em]"
+        className="font-display leading-tight tracking-[-0.02em]"
         style={{
           fontSize: "clamp(2rem, 4vw, 3.2rem)",
-          fontStyle: "italic",
-          color: light ? "#ffffff" : "#0F0F0E",
+          color: light ? "var(--surface)" : "var(--ink)",
         }}
       >
         {title.split(" ").map((word, i) => (
@@ -40,7 +39,7 @@ export default function ScrollHeading({
               style={{
                 display: "inline-block",
                 animation: visible
-                  ? `lineReveal 0.9s cubic-bezier(0.165,0.84,0.44,1) ${80 + i * 100}ms both`
+                  ? `lineReveal 0.6s cubic-bezier(0.4,0,0.2,1) ${80 + i * 100}ms both`
                   : "none",
                 opacity: visible ? undefined : 0,
               }}

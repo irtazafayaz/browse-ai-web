@@ -16,7 +16,7 @@ export default function PageEnterTransition() {
         position: "fixed", inset: 0, zIndex: 9998,
         background: "#111110",
         transform: lifted ? "translateY(-100%)" : "translateY(0)",
-        transition: lifted ? "transform 0.85s cubic-bezier(0.76, 0, 0.24, 1)" : "none",
+        transition: lifted ? "transform 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
         pointerEvents: "none",
       }}
     />
