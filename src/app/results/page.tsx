@@ -189,6 +189,7 @@ function ResultsContent() {
       setSearchMode("image");
       setInputValue("");
       setQuery(""); // clearing query means any later text search is a detected change
+      setFilters({}); // filters don't apply to image search; avoid stale, inert filter chips
       fetchImage(file, 1, true);
     },
     // showToast is stable enough; fetchImage is memoized. `query` is included so the
@@ -218,6 +219,14 @@ function ResultsContent() {
       setHasNext(false);
     }
   };
+
+  // Revoke the preview object URL on unmount so navigating away mid-image-search
+  // doesn't leak it (complements the revoke-on-replace/clear logic above).
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const [dragging, setDragging] = useState(false);
 
