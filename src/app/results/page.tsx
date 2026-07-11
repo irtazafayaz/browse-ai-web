@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { ArrowLeft, BookmarkCheck, ArrowUp } from "lucide-react";
+import { ArrowLeft, BookmarkCheck, ArrowUp, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import MasonryGrid, { MasonrySkeletonGrid } from "@/components/MasonryGrid";
 import Logo from "@/components/Logo";
@@ -204,6 +204,21 @@ function ResultsContent() {
     if (file) runImageSearch(file);
   };
 
+  const clearImageSearch = () => {
+    const restore = preImageQueryRef.current;
+    exitImageMode();
+    if (restore) {
+      setInputValue(restore);
+      setQuery(restore); // "" -> restore is a change; the query effect refetches
+    } else {
+      setInputValue("");
+      setQuery("");
+      setRawProducts([]);
+      setTotal(0);
+      setHasNext(false);
+    }
+  };
+
   const mountedRef = useRef(false);
   useEffect(() => {
     if (mountedRef.current) return;
@@ -346,12 +361,42 @@ function ResultsContent() {
         </div>
 
         <div className="flex-1 flex justify-center px-2 min-w-0">
-          <span
-            className="text-[12px] truncate max-w-[160px] font-mono-brutal"
-            style={{ color: "var(--ink-muted)" }}
-          >
-            {query}
-          </span>
+          {searchMode === "image" && imagePreview ? (
+            <div
+              className="flex items-center gap-1.5 pl-1 pr-1.5 py-1 border-brutal-thin"
+              style={{ background: "var(--surface)", boxShadow: "2px 2px 0 var(--ink)" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imagePreview}
+                alt="Search image"
+                className="w-5 h-5 object-cover"
+                style={{ border: "1px solid var(--ink)" }}
+              />
+              <span
+                className="text-[10px] font-mono-brutal uppercase tracking-wide"
+                style={{ color: "var(--ink)" }}
+              >
+                Image
+              </span>
+              <button
+                type="button"
+                onClick={clearImageSearch}
+                aria-label="Clear image search"
+                className="w-4 h-4 flex items-center justify-center active:scale-90"
+                style={{ color: "var(--ink)" }}
+              >
+                <X size={11} />
+              </button>
+            </div>
+          ) : (
+            <span
+              className="text-[12px] truncate max-w-[160px] font-mono-brutal"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              {query}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2 flex-1 justify-end">
