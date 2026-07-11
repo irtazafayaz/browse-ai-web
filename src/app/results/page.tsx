@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { ArrowLeft, BookmarkCheck, ArrowUp, X } from "lucide-react";
+import { ArrowLeft, BookmarkCheck, ArrowUp, X, Image as ImageIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import MasonryGrid, { MasonrySkeletonGrid } from "@/components/MasonryGrid";
 import Logo from "@/components/Logo";
@@ -219,6 +219,24 @@ function ResultsContent() {
     }
   };
 
+  const [dragging, setDragging] = useState(false);
+
+  const onDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes("Files")) {
+      e.preventDefault();
+      setDragging(true);
+    }
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    if (e.currentTarget === e.target) setDragging(false);
+  };
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) runImageSearch(file);
+  };
+
   const mountedRef = useRef(false);
   useEffect(() => {
     if (mountedRef.current) return;
@@ -339,7 +357,32 @@ function ResultsContent() {
   };
 
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
+    <div
+      style={{ minHeight: "100dvh", background: "var(--bg)" }}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      {dragging && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none"
+          style={{ background: "color-mix(in srgb, var(--accent-soft) 88%, transparent)" }}
+        >
+          <div
+            className="flex items-center gap-3 px-6 py-4 border-brutal"
+            style={{
+              background: "var(--surface)",
+              boxShadow: "6px 6px 0 var(--ink)",
+              borderStyle: "dashed",
+            }}
+          >
+            <ImageIcon size={18} style={{ color: "var(--accent)" }} />
+            <span className="font-display text-sm" style={{ color: "var(--ink)" }}>
+              Drop image to search
+            </span>
+          </div>
+        </div>
+      )}
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       <header
