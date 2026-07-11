@@ -275,7 +275,7 @@ export default function LandingPage() {
       </section>
 
       <section
-        className="relative z-10 py-24 px-6 md:px-12 border-t border-b border-[var(--bg)]"
+        className="relative z-10 py-24 px-6 md:px-12 border-t border-b border-[var(--ink)]"
         ref={statsReveal.ref}
       >
         <div className="max-w-7xl mx-auto">
@@ -383,7 +383,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="relative z-10 border-t border-[var(--bg)] py-8 px-6 md:px-12">
+      <footer className="relative z-10 border-t border-[var(--ink)] py-8 px-6 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Logo size="xs" />
