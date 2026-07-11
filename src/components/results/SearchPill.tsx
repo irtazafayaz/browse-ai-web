@@ -69,11 +69,12 @@ export default function SearchPill({
           <button
             type="button"
             onClick={onCameraClick}
-            title="Image search (coming soon)"
-            className="shrink-0 active:scale-90"
-            style={{ marginRight: 14, lineHeight: 0 }}
+            title="Search by image"
+            aria-label="Search by image"
+            className="shrink-0 active:scale-90 transition-opacity duration-150 ease-out hover:opacity-100"
+            style={{ marginRight: 14, lineHeight: 0, opacity: 0.85 }}
           >
-            <Camera size={16} style={{ color: "rgba(255,255,255,0.28)" }} />
+            <Camera size={16} style={{ color: "var(--accent)" }} />
           </button>
 
           <div className="shrink-0 self-stretch" style={{ width: 1, background: "rgba(255,255,255,0.09)", margin: "5px 16px 5px 0" }} />
