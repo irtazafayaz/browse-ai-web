@@ -13,7 +13,8 @@ import ComingSoonToast from "@/components/results/ComingSoonToast";
 import FilterBar from "@/components/results/FilterBar";
 import ActiveFilterChips from "@/components/results/ActiveFilterChips";
 import { Product, SearchFilters } from "@/lib/types";
-import { searchProducts, toggleBookmark } from "@/lib/api";
+import { searchProducts, searchByImage, toggleBookmark } from "@/lib/api";
+import { validateImageFile } from "@/lib/pendingImageSearch";
 import { useAuth } from "@/lib/AuthContext";
 
 type SortMode = "match" | "price-asc" | "price-desc" | "trending";
@@ -53,6 +54,10 @@ function ResultsContent() {
   const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [searchMode, setSearchMode] = useState<"text" | "image">("text");
+  const [toastMsg, setToastMsg] = useState("Coming soon");
 
   const [sort, setSort] = useState<SortMode>("match");
   const [filters, setFilters] = useState<SearchFilters>({});
@@ -67,8 +72,10 @@ function ResultsContent() {
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const preImageQueryRef = useRef("");
 
-  const showComingSoonToast = () => {
+  const showToast = (message = "Coming soon") => {
+    setToastMsg(message);
     setComingSoon(true);
     setTimeout(() => setComingSoon(false), 2200);
   };
@@ -131,6 +138,72 @@ function ResultsContent() {
     [],
   );
 
+  const fetchImage = useCallback(
+    async (file: File, pageNum: number, reset: boolean) => {
+      if (reset) setLoading(true);
+      else setLoadingMore(true);
+      try {
+        const r = await searchByImage(file, pageNum);
+        setTotal(r.total);
+        setPage(pageNum);
+        setHasNext(r.has_next);
+        if (reset) setRawProducts(r.products);
+        else setRawProducts((prev) => [...prev, ...r.products]);
+      } catch {
+        if (reset) {
+          setRawProducts([]);
+          setTotal(0);
+          setHasNext(false);
+        }
+      } finally {
+        if (reset) setLoading(false);
+        else setLoadingMore(false);
+      }
+    },
+    [],
+  );
+
+  // Leave image mode WITHOUT touching the text query (so callers can restore it).
+  const exitImageMode = () => {
+    setImagePreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setImageFile(null);
+    setSearchMode("text");
+  };
+
+  const runImageSearch = useCallback(
+    (file: File) => {
+      const err = validateImageFile(file);
+      if (err) {
+        showToast(err);
+        return;
+      }
+      preImageQueryRef.current = query; // remember the text query for restore-on-clear
+      setImagePreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(file);
+      });
+      setImageFile(file);
+      setSearchMode("image");
+      setInputValue("");
+      setQuery(""); // clearing query means any later text search is a detected change
+      fetchImage(file, 1, true);
+    },
+    // showToast is stable enough; fetchImage is memoized. `query` is included so the
+    // restore ref captures the current text query (avoids a stale closure).
+    [fetchImage, query],
+  );
+
+  const openImagePicker = () => fileInputRef.current?.click();
+
+  const onImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) runImageSearch(file);
+  };
+
   const mountedRef = useRef(false);
   useEffect(() => {
     if (mountedRef.current) return;
@@ -147,6 +220,7 @@ function ResultsContent() {
       JSON.stringify(filters) !== JSON.stringify(prevFiltersRef.current);
     prevQueryRef.current = query;
     prevFiltersRef.current = filters;
+    if (searchMode === "image") return; // image results are driven by runImageSearch
     if (qChanged || fChanged) {
       if (query) fetchText(query, filters, 1, true);
       else {
@@ -155,7 +229,7 @@ function ResultsContent() {
         setHasNext(false);
       }
     }
-  }, [query, filters, fetchText]);
+  }, [query, filters, fetchText, searchMode]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -163,19 +237,35 @@ function ResultsContent() {
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && hasNext && !loadingMore && !loading) {
-          fetchText(query, filters, page + 1, false);
+          if (searchMode === "image" && imageFile) {
+            fetchImage(imageFile, page + 1, false);
+          } else {
+            fetchText(query, filters, page + 1, false);
+          }
         }
       },
       { threshold: 0.1 },
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [hasNext, loadingMore, loading, page, query, filters, fetchText]);
+  }, [
+    hasNext,
+    loadingMore,
+    loading,
+    page,
+    query,
+    filters,
+    fetchText,
+    searchMode,
+    imageFile,
+    fetchImage,
+  ]);
 
   const handleTextSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const t = inputValue.trim();
     if (!t) return;
+    exitImageMode();
     setQuery(t);
     router.replace(`/results?q=${encodeURIComponent(t)}`, { scroll: false });
   };
@@ -203,6 +293,7 @@ function ResultsContent() {
   );
 
   const clearAll = () => {
+    exitImageMode();
     setInputValue("");
     setQuery("");
     setRawProducts([]);
@@ -212,6 +303,7 @@ function ResultsContent() {
   };
 
   const handleTrendingSelect = (q: string) => {
+    exitImageMode();
     setInputValue(q);
     setQuery(q);
     router.replace(`/results?q=${encodeURIComponent(q)}`, { scroll: false });
@@ -227,7 +319,7 @@ function ResultsContent() {
     loading,
     onSubmit: handleTextSearch,
     onClear: clearAll,
-    onCameraClick: showComingSoonToast,
+    onCameraClick: openImagePicker,
     onTrendingSelect: handleTrendingSelect,
   };
 
@@ -322,7 +414,7 @@ function ResultsContent() {
             hasProducts={rawProducts.length > 0}
             total={total}
             query={query}
-            onComingSoon={showComingSoonToast}
+            onComingSoon={() => showToast()}
           />
           {activeFilterCount > 0 && (
             <ActiveFilterChips filters={filters} onFiltersChange={setFilters} />
@@ -488,9 +580,7 @@ function ResultsContent() {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
-          e.target.value = "";
-        }}
+        onChange={onImageInputChange}
       />
 
       <FilterDrawer
@@ -515,7 +605,7 @@ function ResultsContent() {
         </button>
       )}
 
-      <ComingSoonToast visible={comingSoon} />
+      <ComingSoonToast visible={comingSoon} message={toastMsg} />
 
       <QuickViewModal
         product={quickViewProduct}
