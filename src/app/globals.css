@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAFAF8;
+  --bg: #FDF8EC;
   --surface: #FFFFFF;
-  --primary: #0F0F0E;
-  --secondary: #58574F;
-  --accent: #7A9E74;
-  --accent2: #4D7A47;
-  --accent-muted: #B4CAB0;
-  --accent-warm: #B8925A;
-  --divider: #E6E2DA;
-  --cream: #FAFAF8;
+  --ink: #111111;
+  --ink-muted: #4A4A4A;
+  --accent: #3F8F46;
+  --accent-dark: #245E29;
+  --accent-soft: #CFEAC9;
+  --pop: #FF4FA3;
+  --warn: #F5C518;
+  --error: #E8412C;
 }
 
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--background);
-  color: var(--primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-::selection { background: #7A9E74; color: white; }
+::selection { background: var(--pop); color: var(--surface); }
 
 .chat-scroll::-webkit-scrollbar { display: none; }
 .chat-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -34,15 +34,6 @@ body {
   100% { transform: translateX(-50%); }
 }
 .animate-marquee { animation: marquee 30s linear infinite; }
-
-/* ─── Float orbs ─── */
-@keyframes float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50%       { transform: translateY(-28px) scale(1.05); }
-}
-.animate-float         { animation: float 8s ease-in-out infinite; }
-.animate-float-delayed { animation: float 8s ease-in-out 3s infinite; }
-.animate-float-slow    { animation: float 11s ease-in-out 1.5s infinite; }
 
 /* ─── Fade in ─── */
 @keyframes fadeIn {
@@ -80,7 +71,7 @@ body {
 }
 .word-reveal {
   display: inline-block;
-  animation: wordReveal 0.95s var(--ease-expo) both;
+  animation: wordReveal 0.65s cubic-bezier(0.4,0,0.2,1) both;
   will-change: transform;
 }
 
@@ -91,7 +82,7 @@ body {
 }
 .char-reveal {
   display: inline-block;
-  animation: charReveal 1.05s var(--ease-expo) both;
+  animation: charReveal 0.7s cubic-bezier(0.4,0,0.2,1) both;
   will-change: transform;
 }
 
@@ -102,7 +93,7 @@ body {
 }
 .line-reveal {
   display: inline-block;
-  animation: lineReveal 0.9s var(--ease-expo) both;
+  animation: lineReveal 0.6s cubic-bezier(0.4,0,0.2,1) both;
   will-change: transform;
 }
 
@@ -112,29 +103,8 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .eyebrow-in {
-  animation: eyebrowIn 0.7s var(--ease-expo) both;
+  animation: eyebrowIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
 }
-
-/* ─── Button dual-text hover slide (itsoffbrand style) ─── */
-.btn-dual {
-  position: relative;
-  overflow: hidden;
-}
-.btn-dual .txt-a,
-.btn-dual .txt-b {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: transform 0.6s var(--ease-expo);
-  will-change: transform;
-  white-space: nowrap;
-}
-.btn-dual .txt-b { transform: translateY(100%); }
-.btn-dual:hover .txt-a { transform: translateY(-100%); }
-.btn-dual:hover .txt-b { transform: translateY(0%); }
 
 /* ─── Scale in ─── */
 @keyframes scaleIn {
@@ -153,64 +123,6 @@ body {
 .animate-msg-in {
   animation: msgSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-
-/* ─── Shimmer ─── */
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ─── Rotate-scale hover (button backing shape) ─── */
-.btn-fancy {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
-              color 0.3s ease;
-}
-.btn-fancy::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #0F0F0E;
-  transform: scale3d(0, 1, 1);
-  transform-origin: left center;
-  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  z-index: 0;
-  border-radius: inherit;
-}
-.btn-fancy:hover::before { transform: scale3d(1, 1, 1); }
-.btn-fancy:hover { color: white; }
-.btn-fancy span { position: relative; z-index: 1; }
-
-/* ─── Gradient text (sage shimmer) ─── */
-.gradient-text {
-  background: linear-gradient(135deg, #4D7A47 0%, #7A9E74 45%, #4D7A47 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 3.5s linear infinite;
-}
-
-/* ─── Glassmorphism ─── */
-.glass {
-  background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-.glass-dark {
-  background: rgba(17, 17, 16, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-/* ─── Pulse glow ─── */
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(122,158,116,0.3); }
-  50%       { box-shadow: 0 0 0 8px rgba(122,158,116,0.05); }
-}
-.animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
 
 /* ─── Stagger delay helpers ─── */
 .delay-75   { animation-delay:  75ms; }
@@ -317,11 +229,6 @@ body {
   animation: phSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ─── Editorial serif utility ─── */
-.font-cormorant {
-  font-family: var(--font-cormorant), 'Georgia', serif;
-}
-
 /* ─── Underline slide ─── */
 .underline-slide {
   position: relative;
@@ -336,9 +243,90 @@ body {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: transform 0.15s ease-out;
 }
 .underline-slide:hover::after {
   transform: scaleX(1);
   transform-origin: left;
 }
+
+/* ─── Brutalist type ─── */
+.font-display {
+  font-family: var(--font-archivo-black), 'Arial Black', sans-serif;
+}
+.font-mono-brutal {
+  font-family: var(--font-space-mono), 'Courier New', monospace;
+}
+
+/* ─── Brutalist border ─── */
+.border-brutal { border: 3px solid var(--ink); }
+.border-brutal-thin { border: 2px solid var(--ink); }
+
+/* ─── Brutalist hard shadow (rest / hover / active) ─── */
+.shadow-brutal {
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+.shadow-brutal:hover { box-shadow: 7px 7px 0 var(--ink); transform: translate(-2px, -2px); }
+.shadow-brutal:active { box-shadow: 0 0 0 var(--ink); transform: translate(4px, 4px); }
+
+.shadow-brutal-sm {
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+.shadow-brutal-sm:hover { box-shadow: 4px 4px 0 var(--ink); transform: translate(-1px, -1px); }
+.shadow-brutal-sm:active { box-shadow: 0 0 0 var(--ink); transform: translate(2px, 2px); }
+
+.shadow-brutal-lg {
+  box-shadow: 6px 6px 0 var(--ink);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+.shadow-brutal-lg:hover { box-shadow: 9px 9px 0 var(--ink); transform: translate(-3px, -3px); }
+
+/* ─── Brutalist card ─── */
+.card-brutal {
+  background: var(--surface);
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+.card-brutal:hover { box-shadow: 7px 7px 0 var(--ink); transform: translate(-2px, -3px) rotate(-1deg); }
+
+/* ─── Brutalist tag/badge ─── */
+.tag-brutal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  font-family: var(--font-space-mono), monospace;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+/* ─── Brutalist button ─── */
+.btn-brutal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--surface);
+  font-family: var(--font-space-mono), monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 120ms ease-out, transform 120ms ease-out, background 120ms ease-out;
+  cursor: pointer;
+}
+.btn-brutal:hover { box-shadow: 6px 6px 0 var(--ink); transform: translate(-2px, -2px); }
+.btn-brutal:active { box-shadow: 0 0 0 var(--ink); transform: translate(4px, 4px); }
+.btn-brutal-accent { background: var(--accent); color: var(--surface); }
+.btn-brutal-pop { background: var(--pop); color: var(--ink); }
