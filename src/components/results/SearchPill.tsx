@@ -51,19 +51,17 @@ export default function SearchPill({
         <div
           className={`flex items-center ${!inputFocused ? "animate-pill-breathe" : ""}`}
           style={{
-            background: "rgba(30, 27, 23, 0.93)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            borderRadius: 100,
-            border: "1px solid rgba(255,255,255,0.07)",
+            background: "var(--ink)",
+            borderRadius: 0,
+            border: "3px solid var(--ink)",
             padding: "6px 6px 6px 20px",
             boxShadow: inputFocused
-              ? "0 0 0 2px #7A9E74, 0 8px 32px rgba(0,0,0,0.25), 0 20px 50px rgba(0,0,0,0.15)"
-              : undefined,
+              ? "6px 6px 0 var(--accent)"
+              : "4px 4px 0 var(--ink)",
             transform: inputFocused
-              ? "translateY(-2px) scale(1.006)"
-              : "translateY(0) scale(1)",
-            transition: "box-shadow 0.25s ease, transform 0.35s cubic-bezier(0.19,1,0.22,1)",
+              ? "translate(-2px, -2px)"
+              : "translate(0, 0)",
+            transition: "box-shadow 0.15s ease-out, transform 0.15s ease-out",
           }}
         >
           <Search size={16} style={{ marginRight: 8, color: "rgba(255,255,255,0.92)", flexShrink: 0 }} />
@@ -91,7 +89,7 @@ export default function SearchPill({
               className="w-full bg-transparent outline-none"
               style={{
                 color: "rgba(255,255,255,0.88)",
-                caretColor: "#7A9E74",
+                caretColor: "var(--accent)",
                 fontSize: 14,
                 fontWeight: 500,
                 letterSpacing: "-0.01em",
@@ -133,9 +131,9 @@ export default function SearchPill({
             type="submit"
             className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-105 active:scale-90"
             style={{
-              background: loading || inputFocused ? "#7A9E74" : "rgba(255,255,255,0.10)",
-              boxShadow: loading || inputFocused ? "0 4px 14px rgba(122,158,116,0.45)" : "none",
-              transition: "background 0.22s ease, box-shadow 0.22s ease",
+              background: loading || inputFocused ? "var(--accent)" : "rgba(255,255,255,0.10)",
+              boxShadow: loading || inputFocused ? "2px 2px 0 var(--accent-dark)" : "none",
+              transition: "background 0.15s ease-out, box-shadow 0.15s ease-out",
             }}
           >
             {loading ? (
@@ -150,14 +148,14 @@ export default function SearchPill({
         </div>
 
         <div
-          className="relative mx-3 mt-1.5 rounded-full overflow-hidden"
+          className="relative mx-3 mt-1.5 overflow-hidden"
           style={{ height: 2, opacity: loading ? 1 : 0, transition: "opacity 0.3s ease" }}
         >
           <div
-            className="absolute top-0 h-full rounded-full"
+            className="absolute top-0 h-full"
             style={{
               width: "42%",
-              background: "linear-gradient(90deg, transparent, #7A9E74 40%, #9DC498 60%, transparent)",
+              background: "linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent-soft) 60%, transparent)",
               animation: "searchSweep 1.35s ease-in-out infinite",
             }}
           />
@@ -171,14 +169,12 @@ export default function SearchPill({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-0 right-0 z-50 rounded-2xl overflow-hidden"
+            className="absolute left-0 right-0 z-50 overflow-hidden"
             style={{
               top: "calc(100% + 8px)",
-              background: "rgba(26, 23, 20, 0.97)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.32)",
+              background: "var(--ink)",
+              border: "3px solid var(--ink)",
+              boxShadow: "4px 4px 0 var(--ink)",
             }}
           >
             <div className="px-3 pt-3 pb-2">
@@ -195,7 +191,7 @@ export default function SearchPill({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                   onMouseDown={() => onTrendingSelect(item.query)}
-                  className="w-full flex items-center gap-3 py-2 px-2 rounded-xl text-left transition-colors"
+                  className="w-full flex items-center gap-3 py-2 px-2 text-left transition-colors"
                   style={{ color: "rgba(255,255,255,0.78)" }}
                   whileHover={{ background: "rgba(255,255,255,0.05)" }}
                 >

@@ -202,13 +202,8 @@ body {
 
 /* ─── Search pill idle "breathe" glow ─── */
 @keyframes pillBreathe {
-  0%, 100% {
-    box-shadow: 0 4px 14px rgba(0,0,0,0.16), 0 10px 36px rgba(0,0,0,0.12);
-  }
-  50% {
-    box-shadow: 0 6px 22px rgba(0,0,0,0.20), 0 14px 42px rgba(0,0,0,0.14),
-                0 0 0 1.5px rgba(122,158,116,0.22);
-  }
+  0%, 100% { box-shadow: 4px 4px 0 var(--ink); }
+  50%      { box-shadow: 6px 6px 0 var(--ink); }
 }
 .animate-pill-breathe {
   animation: pillBreathe 3.2s ease-in-out infinite;

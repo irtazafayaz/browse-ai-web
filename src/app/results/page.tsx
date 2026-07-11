@@ -232,33 +232,31 @@ function ResultsContent() {
   };
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#FAFAF8" }}>
+    <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       <header
         className="sticky top-0 z-30 flex items-center px-4"
         style={{
           height: NAV_H,
-          background: "rgba(250,250,248,0.97)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          borderBottom: "1px solid rgba(212,196,168,0.25)",
+          background: "var(--bg)",
+          borderBottom: "3px solid var(--ink)",
         }}
       >
         <div className="flex items-center gap-2 flex-1">
           <button
             onClick={() => router.push("/")}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all"
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--bg)] active:scale-90 transition-all duration-150 ease-out"
           >
-            <ArrowLeft size={15} className="text-[#1A1A1A]" />
+            <ArrowLeft size={15} className="text-[var(--ink)]" />
           </button>
           <Logo size="xs" onClick={() => router.push("/")} />
         </div>
 
         <div className="flex-1 flex justify-center px-2 min-w-0">
           <span
-            className="text-[12px] italic truncate max-w-[160px]"
-            style={{ color: "#58574F" }}
+            className="text-[12px] truncate max-w-[160px] font-mono-brutal"
+            style={{ color: "var(--ink-muted)" }}
           >
             {query}
           </span>
@@ -267,8 +265,8 @@ function ResultsContent() {
         <div className="flex items-center gap-2 flex-1 justify-end">
           {bookmarkCount > 0 && (
             <div
-              className="flex items-center gap-1.5 text-white text-[11px] font-semibold rounded-full px-2.5 py-1"
-              style={{ background: "#1A1A1A" }}
+              className="flex items-center gap-1.5 text-white text-[11px] font-semibold border-brutal-thin px-2.5 py-1"
+              style={{ background: "var(--ink)" }}
             >
               <BookmarkCheck size={11} />
               {bookmarkCount}
@@ -277,8 +275,8 @@ function ResultsContent() {
           {user ? (
             <button
               onClick={() => setAuthOpen(true)}
-              className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center font-black text-white text-[10px] transition-all hover:scale-105 active:scale-95"
-              style={{ background: "#1A1A1A" }}
+              className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center font-black text-white text-[10px] border-brutal-thin transition-all duration-150 ease-out hover:scale-105 active:scale-95"
+              style={{ background: "var(--ink)" }}
               title={user.email}
             >
               {user.avatar_url ? (
@@ -298,10 +296,10 @@ function ResultsContent() {
           ) : (
             <button
               onClick={() => setAuthOpen(true)}
-              className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all hover:bg-[#1A1A1A] hover:text-white active:scale-95"
+              className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-150 ease-out hover:bg-[var(--ink)] hover:text-white active:scale-95"
               style={{
-                border: "1.5px solid #1A1A1A",
-                color: "#1A1A1A",
+                border: "3px solid var(--ink)",
+                color: "var(--ink)",
                 letterSpacing: "0.08em",
               }}
             >
@@ -340,7 +338,7 @@ function ResultsContent() {
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
               className="flex flex-col items-center justify-center gap-4 py-28"
             >
               <motion.div
@@ -356,14 +354,14 @@ function ResultsContent() {
               </motion.div>
               <div className="text-center">
                 <p
-                  className="font-black text-[#1A1A1A] text-base"
+                  className="font-display text-[var(--ink)] text-base"
                   style={{ letterSpacing: "-0.02em" }}
                 >
                   No results found
                 </p>
                 <p
                   className="text-sm max-w-xs mt-1"
-                  style={{ color: "#9B9B9B" }}
+                  style={{ color: "var(--ink-muted)" }}
                 >
                   Try a different search or clear your filters.
                 </p>
@@ -380,8 +378,8 @@ function ResultsContent() {
                   }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setFilters({})}
-                  className="px-4 py-2 text-sm font-bold text-[#1A1A1A] rounded-full hover:bg-[#E8E0D4]"
-                  style={{ border: "1.5px solid #D4C4A8" }}
+                  className="px-4 py-2 text-sm font-bold text-[var(--ink)] hover:bg-[var(--bg)]"
+                  style={{ border: "3px solid var(--ink)" }}
                 >
                   Clear filters
                 </motion.button>
@@ -402,9 +400,9 @@ function ResultsContent() {
                     {[0, 1, 2].map((i) => (
                       <span
                         key={i}
-                        className="w-1.5 h-1.5 rounded-full animate-bounce"
+                        className="w-1.5 h-1.5 animate-bounce"
                         style={{
-                          background: "#7A9E74",
+                          background: "var(--accent)",
                           animationDelay: `${i * 150}ms`,
                         }}
                       />
@@ -414,8 +412,8 @@ function ResultsContent() {
               )}
               {!hasNext && !loadingMore && rawProducts.length > 0 && (
                 <p
-                  className="text-center text-[11px] py-6 font-medium"
-                  style={{ color: "#CCCCCC" }}
+                  className="text-center text-[11px] py-6 font-mono-brutal uppercase"
+                  style={{ color: "var(--ink-muted)" }}
                 >
                   All {total.toLocaleString()} results shown
                 </p>
@@ -448,8 +446,8 @@ function ResultsContent() {
             exit={{ opacity: 0, transition: { duration: 0.15 } }}
           >
             <p
-              className="text-[13px] font-medium mb-4 pointer-events-none select-none"
-              style={{ color: "#BBBBBB" }}
+              className="text-[13px] font-mono-brutal uppercase mb-4 pointer-events-none select-none"
+              style={{ color: "var(--ink-muted)" }}
             >
               Describe what you&apos;re looking for
             </p>
@@ -507,10 +505,10 @@ function ResultsContent() {
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Back to top"
-          className="fixed bottom-24 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-transform"
+          className="fixed bottom-24 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center border-brutal hover:scale-110 active:scale-90 transition-transform duration-150 ease-out"
           style={{
-            background: "#0F0F0E",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.22)",
+            background: "var(--ink)",
+            boxShadow: "4px 4px 0 var(--ink)",
           }}
         >
           <ArrowUp size={15} className="text-white" />
@@ -542,14 +540,14 @@ function ResultsContent() {
 const LoadingDots = () => (
   <div
     className="flex items-center justify-center"
-    style={{ height: "100dvh", background: "#FAFAF8" }}
+    style={{ height: "100dvh", background: "var(--bg)" }}
   >
     <div className="flex gap-1.5">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="w-2 h-2 rounded-full animate-bounce"
-          style={{ background: "#7A9E74", animationDelay: `${i * 150}ms` }}
+          className="w-2 h-2 animate-bounce"
+          style={{ background: "var(--accent)", animationDelay: `${i * 150}ms` }}
         />
       ))}
     </div>

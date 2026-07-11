@@ -55,7 +55,8 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 z-40 animate-fade-in"
+        style={{ background: 'rgba(17,17,17,0.6)' }}
         onClick={onClose}
       />
 
@@ -63,32 +64,31 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
       <div
         className="fixed bottom-0 left-0 right-0 z-50 animate-fade-slide-up"
         style={{
-          background: '#F2EDE4',
-          borderRadius: '16px 16px 0 0',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+          background: 'var(--bg)',
+          borderTop: '3px solid var(--ink)',
           maxHeight: '82vh',
           overflowY: 'auto',
         }}
       >
         {/* Pull handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ background: '#D4C4A8' }} />
+          <div className="w-10 h-1" style={{ background: 'var(--ink)' }} />
         </div>
 
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-3"
-          style={{ borderBottom: '1px solid rgba(212,196,168,0.5)' }}
+          style={{ borderBottom: '3px solid var(--ink)' }}
         >
           <div className="flex items-center gap-2">
-            <SlidersHorizontal size={14} className="text-[#6B6B6B]" />
-            <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.01em' }}>
+            <SlidersHorizontal size={14} style={{ color: 'var(--ink-muted)' }} />
+            <span className="font-black text-sm" style={{ color: 'var(--ink)', letterSpacing: '-0.01em' }}>
               Filters
             </span>
             {activeCount > 0 && (
               <span
                 className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-black"
-                style={{ background: '#C4A882' }}
+                style={{ background: 'var(--ink)' }}
               >
                 {activeCount}
               </span>
@@ -96,9 +96,12 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center hover:bg-[#E8E0D4] rounded-full transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
+            style={{ color: 'var(--ink-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
           >
-            <X size={14} className="text-[#6B6B6B]" />
+            <X size={14} />
           </button>
         </div>
 
@@ -108,7 +111,7 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
           {/* Brand */}
           {brands.length > 0 && (
             <section>
-              <p className="text-[10px] font-black tracking-[0.18em] uppercase text-[#6B6B6B] mb-3">Brand</p>
+              <p className="text-[10px] font-black tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--ink-muted)' }}>Brand</p>
               <div className="flex flex-wrap gap-2">
                 {brands.map(b => {
                   const selected = local.brand === b;
@@ -116,11 +119,11 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
                     <button
                       key={b}
                       onClick={() => setLocal(prev => ({ ...prev, brand: selected ? undefined : b }))}
-                      className="px-3 py-1.5 text-[11px] font-semibold rounded-full transition-all duration-200 active:scale-95"
+                      className="px-3 py-1.5 text-[11px] font-semibold transition-all duration-150 ease-out active:scale-95"
                       style={{
-                        background: selected ? '#1A1A1A' : '#EDE9E1',
-                        color: selected ? 'white' : '#4B4B4B',
-                        border: selected ? '1px solid #1A1A1A' : '1px solid transparent',
+                        background: selected ? 'var(--ink)' : 'var(--surface)',
+                        color: selected ? 'white' : 'var(--ink-muted)',
+                        border: '2px solid var(--ink)',
                       }}
                     >
                       {b}
@@ -133,7 +136,7 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
 
           {/* Price range */}
           <section>
-            <p className="text-[10px] font-black tracking-[0.18em] uppercase text-[#6B6B6B] mb-3">Price range</p>
+            <p className="text-[10px] font-black tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--ink-muted)' }}>Price range</p>
             <div className="flex items-center gap-3">
               <input
                 type="number"
@@ -141,37 +144,35 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
                 placeholder="Min $"
                 value={local.minPrice ?? ''}
                 onChange={e => setLocal(prev => ({ ...prev, minPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                className="flex-1 px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-all"
+                className="flex-1 px-3 py-2.5 text-sm outline-none transition-all"
                 style={{
-                  background: '#EDE9E1',
-                  border: '1.5px solid #D4C4A8',
+                  background: 'var(--surface)',
+                  color: 'var(--ink)',
+                  border: '3px solid var(--ink)',
                   borderRadius: 0,
                 }}
-                onFocus={e => { (e.target as HTMLInputElement).style.borderColor = '#1A1A1A'; }}
-                onBlur={e => { (e.target as HTMLInputElement).style.borderColor = '#D4C4A8'; }}
               />
-              <span className="text-[#AAAAAA] text-sm shrink-0 font-medium">—</span>
+              <span className="text-sm shrink-0 font-medium" style={{ color: 'var(--ink-muted)' }}>—</span>
               <input
                 type="number"
                 min={0}
                 placeholder="Max $"
                 value={local.maxPrice ?? ''}
                 onChange={e => setLocal(prev => ({ ...prev, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                className="flex-1 px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-all"
+                className="flex-1 px-3 py-2.5 text-sm outline-none transition-all"
                 style={{
-                  background: '#EDE9E1',
-                  border: '1.5px solid #D4C4A8',
+                  background: 'var(--surface)',
+                  color: 'var(--ink)',
+                  border: '3px solid var(--ink)',
                   borderRadius: 0,
                 }}
-                onFocus={e => { (e.target as HTMLInputElement).style.borderColor = '#1A1A1A'; }}
-                onBlur={e => { (e.target as HTMLInputElement).style.borderColor = '#D4C4A8'; }}
               />
             </div>
           </section>
 
           {/* Style tags */}
           <section>
-            <p className="text-[10px] font-black tracking-[0.18em] uppercase text-[#6B6B6B] mb-3">Style</p>
+            <p className="text-[10px] font-black tracking-[0.18em] uppercase mb-3" style={{ color: 'var(--ink-muted)' }}>Style</p>
             <div className="flex flex-wrap gap-2">
               {COMMON_TAGS.map(tag => {
                 const selected = (local.tags ?? []).includes(tag);
@@ -179,11 +180,11 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className="px-3 py-1.5 text-[11px] font-semibold rounded-full transition-all duration-200 active:scale-95 capitalize"
+                    className="px-3 py-1.5 text-[11px] font-semibold transition-all duration-150 ease-out active:scale-95 capitalize"
                     style={{
-                      background: selected ? '#1A1A1A' : '#EDE9E1',
-                      color: selected ? 'white' : '#4B4B4B',
-                      border: selected ? '1px solid #1A1A1A' : '1px solid transparent',
+                      background: selected ? 'var(--ink)' : 'var(--surface)',
+                      color: selected ? 'white' : 'var(--ink-muted)',
+                      border: '2px solid var(--ink)',
                     }}
                   >
                     {tag}
@@ -197,19 +198,21 @@ export default function FilterDrawer({ open, onClose, filters, onChange, activeC
         {/* Action buttons */}
         <div
           className="px-5 pb-8 pt-3 flex gap-3"
-          style={{ borderTop: '1px solid rgba(212,196,168,0.4)' }}
+          style={{ borderTop: '3px solid var(--ink)' }}
         >
           <button
             onClick={handleClear}
-            className="flex-1 py-3 text-sm font-bold text-[#1A1A1A] transition-all duration-200 hover:bg-[#E8E0D4] active:scale-[0.98]"
-            style={{ border: '1.5px solid #D4C4A8' }}
+            className="flex-1 py-3 text-sm font-bold transition-all duration-150 ease-out active:scale-[0.98]"
+            style={{ color: 'var(--ink)', background: 'var(--surface)', border: '3px solid var(--ink)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'; }}
           >
             Clear all
           </button>
           <button
             onClick={handleApply}
-            className="flex-1 py-3 text-sm font-black text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
-            style={{ background: '#1A1A1A' }}
+            className="flex-1 py-3 text-sm font-black text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.98]"
+            style={{ background: 'var(--ink)', border: '3px solid var(--ink)' }}
           >
             Apply filters
           </button>
