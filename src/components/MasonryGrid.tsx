@@ -70,6 +70,7 @@ function useReveal(ref: React.RefObject<HTMLElement | null>) {
 /* ── Animated card wrapper ── */
 function RevealCard({
   product,
+  index,
   colIndex,
   rowInCol,
   size,
@@ -78,6 +79,7 @@ function RevealCard({
   onQuickView,
 }: {
   product: Product;
+  index: number;
   colIndex: number;
   rowInCol: number;
   size: CardSize;
@@ -105,8 +107,8 @@ function RevealCard({
           ? "translateY(0) scale(1)"
           : "translateY(22px) scale(0.97)",
         transition: `
-          opacity   0.5s  cubic-bezier(0.19,1,0.22,1) ${delay}ms,
-          transform 0.55s cubic-bezier(0.19,1,0.22,1) ${delay}ms
+          opacity   0.35s cubic-bezier(0.4,0,0.2,1) ${delay}ms,
+          transform 0.38s cubic-bezier(0.4,0,0.2,1) ${delay}ms
         `,
       }}
     >
@@ -116,6 +118,7 @@ function RevealCard({
         onMoreLikeThis={onMoreLikeThis}
         onQuickView={onQuickView}
         size={size}
+        rotate={index % 2 === 0 ? -1 : 1}
       />
     </div>
   );
@@ -128,7 +131,7 @@ function RevealCard({
   The last N items (where N < numCols) always land in adjacent columns,
   eliminating the visual gap seen with uneven height estimates.
 */
-type ColItem = { product: Product; size: CardSize };
+type ColItem = { product: Product; size: CardSize; index: number };
 
 function packColumns(products: Product[], numCols: number): ColItem[][] {
   const cols: ColItem[][] = Array.from({ length: numCols }, () => []);
@@ -141,7 +144,7 @@ function packColumns(products: Product[], numCols: number): ColItem[][] {
     for (let c = 1; c < numCols; c++) {
       if (heights[c] < heights[shortestCol]) shortestCol = c;
     }
-    cols[shortestCol].push({ product, size });
+    cols[shortestCol].push({ product, size, index: i });
     heights[shortestCol] += APPROX_H + 14; // 14 = gap between cards
   });
 
@@ -149,16 +152,14 @@ function packColumns(products: Product[], numCols: number): ColItem[][] {
 }
 
 /* ── Shimmer skeleton card ── */
-function SkeletonCard({ delay = 0 }: { delay?: number }) {
+function SkeletonCard() {
   return (
     <div
-      className="rounded-xl overflow-hidden"
+      className="overflow-hidden border-brutal"
       style={{
         aspectRatio: "4/5",
-        background:
-          "linear-gradient(90deg, #EDE9E1 25%, #E4DDD3 50%, #EDE9E1 75%)",
-        backgroundSize: "200% 100%",
-        animation: `skeletonShimmer 1.6s ease-in-out ${delay}ms infinite`,
+        background: "var(--accent-soft)",
+        boxShadow: "4px 4px 0 var(--ink)",
       }}
     />
   );
@@ -181,16 +182,19 @@ export default function MasonryGrid({
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center gap-4">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{ background: "#1A1A1A" }}
+          className="w-14 h-14 flex items-center justify-center border-brutal"
+          style={{ background: "var(--ink)", boxShadow: "4px 4px 0 var(--ink)" }}
         >
           <span className="text-2xl">🔍</span>
         </div>
         <div>
-          <p className="font-black text-[#1A1A1A] text-base tracking-tight">
+          <p
+            className="font-display text-base tracking-tight"
+            style={{ color: "var(--ink)" }}
+          >
             No results found
           </p>
-          <p className="text-sm text-[#8B8B8B] mt-1">
+          <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
             Try a different search or refine with AI
           </p>
         </div>
@@ -202,10 +206,11 @@ export default function MasonryGrid({
     <div className="flex gap-3">
       {columns.map((colItems, ci) => (
         <div key={ci} className="flex-1 flex flex-col gap-3 min-w-0">
-          {colItems.map(({ product, size }, rowInCol) => (
+          {colItems.map(({ product, size, index }, rowInCol) => (
             <RevealCard
               key={product.id}
               product={product}
+              index={index}
               colIndex={ci}
               rowInCol={rowInCol}
               size={size}
@@ -228,7 +233,7 @@ export function MasonrySkeletonGrid({ cols = 4 }: { cols?: number }) {
       {perCol.map((count, ci) => (
         <div key={ci} className="flex-1 flex flex-col gap-3 min-w-0">
           {Array.from({ length: count }).map((_, ri) => (
-            <SkeletonCard key={ri} delay={ci * 80 + ri * 50} />
+            <SkeletonCard key={ri} />
           ))}
         </div>
       ))}
