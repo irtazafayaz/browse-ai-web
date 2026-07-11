@@ -30,10 +30,8 @@ export default function QuickViewModal({
             style={{
               position: "fixed",
               top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backgroundColor: "rgba(17, 17, 17, 0.6)",
               zIndex: 999999,
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
             }}
           />
           <div
@@ -53,8 +51,9 @@ export default function QuickViewModal({
                 width: "min(100%, 420px)",
                 height: "min(100%, 80vh)",
                 aspectRatio: "4/5",
-                backgroundColor: "#FAFAF8",
-                borderRadius: "16px",
+                backgroundColor: "var(--surface)",
+                border: "3px solid var(--ink)",
+                boxShadow: "4px 4px 0 var(--ink)",
                 overflow: "hidden",
                 position: "relative",
                 pointerEvents: "auto",
@@ -69,10 +68,10 @@ export default function QuickViewModal({
                     style={{
                       position: "absolute", inset: 0,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "linear-gradient(145deg, #EDE8E0 0%, #DDD5C6 100%)",
+                      background: "linear-gradient(145deg, var(--bg) 0%, var(--bg) 100%)",
                     }}
                   >
-                    <Zap size={60} style={{ color: "#9B8877", opacity: 0.4 }} />
+                    <Zap size={60} style={{ color: "var(--ink-muted)", opacity: 0.4 }} />
                   </div>
                 )}
 
@@ -89,15 +88,13 @@ export default function QuickViewModal({
                     position: "absolute", top: "16px", right: "16px",
                     width: "40px", height: "40px",
                     borderRadius: "50%",
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
+                    backgroundColor: "var(--surface)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "none", cursor: "pointer", zIndex: 10,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    border: "2px solid var(--ink)", cursor: "pointer", zIndex: 10,
+                    boxShadow: "2px 2px 0 var(--ink)",
                   }}
                 >
-                  <X size={18} style={{ color: "#1A1A1A" }} />
+                  <X size={18} style={{ color: "var(--ink)" }} />
                 </button>
 
                 <button
@@ -110,18 +107,16 @@ export default function QuickViewModal({
                     position: "absolute", bottom: "16px", left: "16px",
                     width: "40px", height: "40px",
                     borderRadius: "50%",
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
+                    backgroundColor: "var(--surface)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "none", cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    border: "2px solid var(--ink)", cursor: "pointer",
+                    boxShadow: "2px 2px 0 var(--ink)",
                   }}
                 >
                   {product.isBookmarked ? (
-                    <BookmarkCheck size={18} style={{ color: "#7A9E74" }} />
+                    <BookmarkCheck size={18} style={{ color: "var(--accent)" }} />
                   ) : (
-                    <Bookmark size={18} style={{ color: "#1A1A1A" }} />
+                    <Bookmark size={18} style={{ color: "var(--ink)" }} />
                   )}
                 </button>
 
@@ -131,12 +126,11 @@ export default function QuickViewModal({
                       style={{
                         fontSize: "10px", fontWeight: 900, letterSpacing: "0.08em",
                         textTransform: "uppercase",
-                        padding: "6px 12px", borderRadius: "50px",
-                        backgroundColor: "rgba(26, 26, 26, 0.85)",
-                        color: "white",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        padding: "6px 12px",
+                        backgroundColor: "var(--warn)",
+                        color: "var(--ink)",
+                        border: "2px solid var(--ink)",
+                        boxShadow: "2px 2px 0 var(--ink)",
                       }}
                     >
                       -{Math.round((1 - product.price / product.originalPrice) * 100)}%
@@ -150,13 +144,11 @@ export default function QuickViewModal({
                     position: "absolute", bottom: "16px", right: "16px",
                     padding: "8px 16px",
                     fontSize: "11px", fontWeight: 900, letterSpacing: "0.08em",
-                    textTransform: "uppercase", borderRadius: "50px",
-                    backgroundColor: "rgba(26, 26, 26, 0.9)",
-                    color: "white",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    border: "none", cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                    textTransform: "uppercase",
+                    backgroundColor: "var(--ink)",
+                    color: "var(--surface)",
+                    border: "3px solid var(--ink)", cursor: "pointer",
+                    boxShadow: "4px 4px 0 var(--ink)",
                   }}
                 >
                   View Details

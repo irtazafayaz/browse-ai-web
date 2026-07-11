@@ -27,41 +27,41 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#F2EDE4' }}>
+    <div className="flex flex-col h-full" style={{ background: 'var(--bg)' }}>
 
       {/* ── Header ── */}
       <div className="shrink-0 px-5 pt-5 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[var(--ink)] flex items-center justify-center">
               <span className="text-white text-xs font-black tracking-tighter">B</span>
             </div>
             <div>
-              <p className="font-black text-[#1A1A1A] text-sm tracking-tight leading-none">Browse AI</p>
-              <p className="text-[10px] text-[#8B7355] font-semibold uppercase tracking-widest leading-none mt-0.5">Stylist</p>
+              <p className="font-black text-[var(--ink)] text-sm tracking-tight leading-none">Browse AI</p>
+              <p className="text-[10px] text-[var(--warn)] font-semibold uppercase tracking-widest leading-none mt-0.5">Stylist</p>
             </div>
           </div>
           {/* Live dot */}
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] text-[#8B8B8B] font-semibold tracking-widest uppercase">Live</span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--accent)" }} />
+            <span className="text-[10px] text-[var(--ink-muted)] font-semibold tracking-widest uppercase">Live</span>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="mt-4 h-px bg-gradient-to-r from-transparent via-[#D4C4A8] to-transparent" />
+        <div className="mt-4 h-px bg-gradient-to-r from-transparent via-[var(--warn)] to-transparent" />
       </div>
 
       {/* ── Messages ── */}
       <div className="flex-1 overflow-y-auto chat-scroll px-4 pb-2 space-y-3">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-10 animate-fade-in">
-            <div className="w-14 h-14 rounded-2xl bg-[#1A1A1A] flex items-center justify-center">
-              <Sparkles size={22} className="text-[#C4A882]" />
+            <div className="w-14 h-14 bg-[var(--ink)] flex items-center justify-center border-brutal-thin shadow-brutal-sm">
+              <Sparkles size={22} className="text-[var(--warn)]" />
             </div>
             <div>
-              <p className="font-black text-[#1A1A1A] text-sm tracking-tight">Your AI stylist</p>
-              <p className="text-[#8B8B8B] text-xs leading-relaxed mt-1 max-w-[160px] mx-auto">
+              <p className="font-black text-[var(--ink)] text-sm tracking-tight">Your AI stylist</p>
+              <p className="text-[var(--ink-muted)] text-xs leading-relaxed mt-1 max-w-[160px] mx-auto">
                 Tell me what you&apos;re looking for in plain English
               </p>
             </div>
@@ -71,8 +71,8 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
                 <button
                   key={s}
                   onClick={() => onSend(s.replace(/"/g, ''))}
-                  className="text-left text-xs text-[#6B6B6B] px-3 py-2 rounded-xl border border-[#E0DDD6] hover:border-[#1A1A1A] hover:text-[#1A1A1A] transition-all duration-200"
-                  style={{ background: 'rgba(255,255,255,0.6)' }}
+                  className="text-left text-xs text-[var(--ink-muted)] px-3 py-2 border-brutal-thin border-[var(--bg)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition-all ease-out duration-150"
+                  style={{ background: 'var(--surface)' }}
                 >
                   {s}
                 </button>
@@ -88,24 +88,20 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
             style={{ animationDelay: `${Math.min(i * 30, 120)}ms` }}
           >
             {msg.sender === 'ai' && (
-              <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0">
-                <span className="text-[#C4A882] text-[9px] font-black">B</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--ink)] flex items-center justify-center shrink-0">
+                <span className="text-[var(--warn)] text-[9px] font-black">B</span>
               </div>
             )}
             <div
-              className={`max-w-[78%] px-3.5 py-2.5 text-xs leading-relaxed rounded-2xl font-medium ${
+              className={`max-w-[78%] px-3.5 py-2.5 text-xs leading-relaxed font-medium border-brutal-thin shadow-brutal-sm ${
                 msg.sender === 'user'
-                  ? 'bg-[#1A1A1A] text-white rounded-br-sm'
-                  : 'text-[#1A1A1A] rounded-bl-sm'
+                  ? 'text-white'
+                  : 'text-[var(--ink)]'
               }`}
               style={{
                 background: msg.sender === 'user'
-                  ? '#1A1A1A'
-                  : 'rgba(255,255,255,0.80)',
-                boxShadow: msg.sender === 'user'
-                  ? '0 4px 14px rgba(26,26,26,0.28)'
-                  : '0 2px 8px rgba(0,0,0,0.07)',
-                backdropFilter: msg.sender === 'ai' ? 'blur(8px)' : undefined,
+                  ? 'var(--ink)'
+                  : 'var(--surface)',
               }}
             >
               {msg.text}
@@ -116,17 +112,17 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
         {/* Typing indicator */}
         {isTyping && (
           <div className="flex items-end gap-2 animate-msg-in">
-            <div className="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0">
-              <span className="text-[#C4A882] text-[9px] font-black">B</span>
+            <div className="w-6 h-6 rounded-full bg-[var(--ink)] flex items-center justify-center shrink-0">
+              <span className="text-[var(--warn)] text-[9px] font-black">B</span>
             </div>
             <div
-              className="rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5 items-center"
-              style={{ background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(8px)', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}
+              className="px-4 py-3 flex gap-1.5 items-center border-brutal-thin shadow-brutal-sm"
+              style={{ background: 'var(--surface)' }}
             >
               {[0, 1, 2].map(i => (
                 <span
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-[#8B7355] animate-bounce"
+                  className="w-1.5 h-1.5 rounded-full bg-[var(--warn)] animate-bounce"
                   style={{ animationDelay: `${i * 140}ms` }}
                 />
               ))}
@@ -143,13 +139,12 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
             <button
               key={chip.id}
               onClick={() => onToggleFilter(chip.id)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-200"
+              className="shrink-0 px-3 py-1.5 text-[11px] font-bold border-brutal-thin transition-all ease-out duration-150"
               style={{
-                background: chip.isSelected ? '#1A1A1A' : 'rgba(255,255,255,0.7)',
-                color: chip.isSelected ? 'white' : '#1A1A1A',
-                borderColor: chip.isSelected ? '#1A1A1A' : '#D4C4A8',
-                transform: chip.isSelected ? 'scale(1.03)' : 'scale(1)',
-                boxShadow: chip.isSelected ? '0 4px 12px rgba(0,0,0,0.22)' : 'none',
+                background: chip.isSelected ? 'var(--ink)' : 'var(--surface)',
+                color: chip.isSelected ? 'white' : 'var(--ink)',
+                borderColor: 'var(--ink)',
+                boxShadow: chip.isSelected ? '2px 2px 0 var(--ink)' : 'none',
               }}
             >
               {chip.label}
@@ -161,16 +156,13 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
       {/* ── Input ── */}
       <div className="shrink-0 px-4 pb-4 pt-2">
         <div
-          className="flex items-center gap-2 rounded-2xl px-4 py-3 transition-all duration-200"
+          className="flex items-center gap-2 px-4 py-3 transition-all ease-out duration-150"
           style={{
-            background: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(12px)',
-            border: inputFocused
-              ? '1.5px solid rgba(26,26,26,0.35)'
-              : '1.5px solid rgba(212,196,168,0.6)',
+            background: 'var(--surface)',
+            border: '3px solid var(--ink)',
             boxShadow: inputFocused
-              ? '0 0 0 3px rgba(26,26,26,0.06), 0 4px 16px rgba(0,0,0,0.08)'
-              : '0 2px 8px rgba(0,0,0,0.06)',
+              ? '4px 4px 0 var(--ink)'
+              : '2px 2px 0 var(--ink)',
           }}
         >
           <input
@@ -182,17 +174,16 @@ export default function ChatPanel({ messages, filters, isTyping, onSend, onToggl
             onBlur={() => setInputFocused(false)}
             disabled={isTyping}
             placeholder="Refine your search..."
-            className="flex-1 bg-transparent outline-none text-sm text-[#1A1A1A] placeholder-[#AAAAAA] font-medium"
+            className="flex-1 bg-transparent outline-none text-sm text-[var(--ink)] placeholder-[var(--ink-muted)] font-medium"
           />
           <button
             onClick={handleSend}
             disabled={isTyping || !input.trim()}
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0"
+            className="w-8 h-8 flex items-center justify-center transition-all ease-out duration-150 shrink-0"
             style={{
-              background: input.trim() && !isTyping ? '#1A1A1A' : 'transparent',
-              color: input.trim() && !isTyping ? 'white' : '#CCCCCC',
-              transform: input.trim() && !isTyping ? 'scale(1)' : 'scale(0.88)',
-              boxShadow: input.trim() && !isTyping ? '0 4px 12px rgba(0,0,0,0.22)' : 'none',
+              background: input.trim() && !isTyping ? 'var(--ink)' : 'transparent',
+              color: input.trim() && !isTyping ? 'white' : 'var(--ink-muted)',
+              boxShadow: input.trim() && !isTyping ? '2px 2px 0 var(--ink)' : 'none',
             }}
           >
             <ArrowUp size={14} />
