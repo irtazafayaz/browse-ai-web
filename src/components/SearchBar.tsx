@@ -52,13 +52,10 @@ export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
   return (
     <div className="w-full transition-all duration-300" style={{ maxWidth }}>
       <div
-        className="flex items-center bg-white rounded-full transition-all duration-300"
+        className="flex items-center bg-white border-brutal shadow-brutal-sm"
         style={{
           padding: '6px 6px 6px 20px',
-          boxShadow: focused
-            ? '0 0 0 2.5px rgba(26,26,26,0.22), 0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06)'
-            : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
-          transform: focused ? 'scale(1.012)' : 'scale(1)',
+          boxShadow: focused ? '4px 4px 0 var(--ink)' : '2px 2px 0 var(--ink)',
         }}
       >
         <div
@@ -66,8 +63,8 @@ export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
           style={{ transform: focused ? 'rotate(-10deg) scale(1.1)' : 'rotate(0deg) scale(1)' }}
         >
           {focused
-            ? <Edit3 size={18} className="text-[#1A1A1A]" />
-            : <Search size={18} className="text-[#8B8B8B]" />
+            ? <Edit3 size={18} className="text-[var(--ink)]" />
+            : <Search size={18} className="text-[var(--ink-muted)]" />
           }
         </div>
 
@@ -75,7 +72,7 @@ export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
           {/* Rotating placeholder */}
           {!focused && !value && (
             <span
-              className="absolute inset-0 flex items-center text-[#9B9B9B] italic text-sm pointer-events-none"
+              className="absolute inset-0 flex items-center text-[var(--ink-muted)] italic text-sm pointer-events-none"
               style={{
                 opacity: promptVisible ? 1 : 0,
                 transform: promptVisible ? 'translateY(0)' : 'translateY(-4px)',
@@ -93,20 +90,18 @@ export default function SearchBar({ onSubmit, maxWidth = 680 }: Props) {
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onKeyDown={handleKey}
-            className="w-full bg-transparent outline-none text-[#1A1A1A] text-sm py-3"
-            style={{ caretColor: '#1A1A1A' }}
+            className="w-full bg-transparent outline-none text-[var(--ink)] text-sm py-3"
+            style={{ caretColor: 'var(--ink)' }}
           />
         </div>
 
         <button
           onClick={handleSubmit}
-          className="w-11 h-11 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-all duration-200 active:scale-90"
+          className="w-11 h-11 rounded-full border-brutal-thin shadow-brutal-sm flex items-center justify-center shrink-0"
           style={{
-            boxShadow: submitting
-              ? '0 0 0 6px rgba(26,26,26,0.08)'
-              : '0 4px 12px rgba(0,0,0,0.20)',
-            transform: submitting ? 'scale(0.92)' : 'scale(1)',
-            background: submitting ? '#333' : '#1A1A1A',
+            background: 'var(--ink)',
+            boxShadow: submitting ? '0 0 0 var(--ink)' : undefined,
+            transform: submitting ? 'translate(2px, 2px) scale(0.92)' : undefined,
           }}
         >
           <ArrowRight

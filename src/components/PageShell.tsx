@@ -3,15 +3,13 @@ import Logo from "@/components/Logo";
 
 export default function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ minHeight: "100dvh", background: "#FAFAF8", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100dvh", background: "var(--bg)", display: "flex", flexDirection: "column" }}>
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-6 md:px-10"
         style={{
           height: 56,
-          background: "rgba(250,250,248,0.95)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(212,196,168,0.35)",
+          background: "var(--surface)",
+          borderBottom: "3px solid var(--ink)",
         }}
       >
         <Logo size="sm" />
@@ -24,8 +22,8 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
             <Link
               key={href}
               href={href}
-              className="text-[12px] font-semibold uppercase tracking-widest transition-colors duration-200"
-              style={{ color: "#6B6B6B" }}
+              className="underline-slide text-[12px] font-semibold uppercase tracking-widest"
+              style={{ color: "var(--ink-muted)" }}
             >
               {label}
             </Link>
@@ -33,8 +31,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
         </nav>
         <Link
           href="/results"
-          className="px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wider transition-all duration-200 hover:opacity-90 active:scale-95"
-          style={{ background: "#7A9E74", color: "#FFFFFF" }}
+          className="btn-brutal btn-brutal-accent px-4 py-2 text-[11px]"
         >
           Start Searching
         </Link>
@@ -42,7 +39,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1">{children}</main>
 
-      <footer style={{ background: "#0F0F0E", color: "rgba(255,255,255,0.55)" }}>
+      <footer style={{ background: "var(--ink)", color: "rgba(255,255,255,0.55)" }}>
         <div className="max-w-6xl mx-auto px-6 md:px-10 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div>
             <p className="text-white font-black text-sm tracking-tighter mb-3">Browse AI</p>
@@ -51,7 +48,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "#7A9E74" }}>Discover</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Discover</p>
             <ul className="space-y-2 text-[12px]">
               {[
                 { href: "/results?q=lawn+suits", label: "Lawn Suits" },
@@ -66,7 +63,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "#7A9E74" }}>Company</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Company</p>
             <ul className="space-y-2 text-[12px]">
               {[
                 { href: "/about", label: "About" },
@@ -80,7 +77,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "#7A9E74" }}>Legal</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Legal</p>
             <ul className="space-y-2 text-[12px]">
               {[
                 { href: "/privacy", label: "Privacy Policy" },
