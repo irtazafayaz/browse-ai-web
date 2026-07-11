@@ -20,9 +20,9 @@ function GoogleIcon() {
 function OrDivider() {
   return (
     <div className="flex items-center gap-3 my-1">
-      <div className="flex-1 h-px" style={{ background: 'rgba(212,196,168,0.6)' }} />
-      <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#AAAAAA]">or</span>
-      <div className="flex-1 h-px" style={{ background: 'rgba(212,196,168,0.6)' }} />
+      <div className="flex-1 h-px" style={{ background: 'var(--ink)' }} />
+      <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--ink-muted)]">or</span>
+      <div className="flex-1 h-px" style={{ background: 'var(--ink)' }} />
     </div>
   );
 }
@@ -50,34 +50,34 @@ function Field({
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-black tracking-[0.18em] uppercase text-[#6B6B6B]">{label}</label>
+      <label className="text-[10px] font-black tracking-[0.18em] uppercase text-[var(--ink-muted)]">{label}</label>
       <div className="relative">
         <input
           type={isPassword && show ? 'text' : type}
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full px-3.5 py-2.5 text-sm text-[#1A1A1A] outline-none transition-all duration-200"
+          className="w-full px-3.5 py-2.5 text-sm text-[var(--ink)] outline-none transition-all duration-150"
           style={{
-            background: '#F2EDE4',
-            border: error ? '1.5px solid #E57373' : '1.5px solid #D4C4A8',
+            background: 'var(--bg)',
+            border: error ? '3px solid var(--error)' : '3px solid var(--ink)',
             borderRadius: 0,
           }}
-          onFocus={e => { (e.target as HTMLInputElement).style.borderColor = '#1A1A1A'; }}
-          onBlur={e => { (e.target as HTMLInputElement).style.borderColor = error ? '#E57373' : '#D4C4A8'; }}
+          onFocus={e => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
+          onBlur={e => { (e.target as HTMLInputElement).style.borderColor = error ? 'var(--error)' : 'var(--ink)'; }}
         />
         {isPassword && (
           <button
             type="button"
             tabIndex={-1}
             onClick={() => setShow(v => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors"
           >
             {show ? <EyeOff size={13} /> : <Eye size={13} />}
           </button>
         )}
       </div>
-      {error && <p className="text-[10px] text-[#E57373] font-medium">{error}</p>}
+      {error && <p className="text-[10px] text-[var(--error)] font-medium">{error}</p>}
     </div>
   );
 }
@@ -143,7 +143,7 @@ export default function AuthModal({ open, onClose }: Props) {
       {[0, 1, 2].map(i => (
         <span
           key={i}
-          className={`w-1.5 h-1.5 rounded-full animate-bounce ${dark ? 'bg-[#1A1A1A]' : 'bg-white'}`}
+          className={`w-1.5 h-1.5 rounded-full animate-bounce ${dark ? 'bg-[var(--ink)]' : 'bg-white'}`}
           style={{ animationDelay: `${i * 120}ms` }}
         />
       ))}
@@ -156,8 +156,8 @@ export default function AuthModal({ open, onClose }: Props) {
       type="button"
       disabled={googleLoading || loading}
       onClick={() => { setError(''); triggerGoogle(); }}
-      className="w-full py-3 flex items-center justify-center gap-2.5 text-sm font-semibold text-[#1A1A1A] transition-all duration-200 hover:bg-[#ECEAE5] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-      style={{ background: '#FAFAF8', border: '1.5px solid #D4C4A8', borderRadius: 0 }}
+      className="btn-brutal w-full py-3 flex items-center justify-center gap-2.5 text-sm font-semibold text-[var(--ink)] transition-all duration-150 hover:bg-[var(--bg)] disabled:opacity-50 disabled:cursor-not-allowed"
+      style={{ background: 'var(--surface)', borderRadius: 0 }}
     >
       {googleLoading ? <Dots dark /> : <><GoogleIcon />Continue with Google</>}
     </button>
@@ -172,31 +172,31 @@ export default function AuthModal({ open, onClose }: Props) {
       <div
         ref={overlayRef}
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
-        style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(8px)' }}
+        style={{ background: 'rgba(17,17,17,0.6)' }}
         onClick={e => { if (e.target === overlayRef.current) onClose(); }}
       >
         <div
-          className="w-full max-w-sm animate-fade-slide-up my-auto"
-          style={{ background: '#F2EDE4', boxShadow: '0 32px 80px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.10)' }}
+          className="border-brutal shadow-brutal-lg w-full max-w-sm animate-fade-slide-up my-auto"
+          style={{ background: 'var(--surface)' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(212,196,168,0.5)' }}>
+          <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '3px solid var(--ink)' }}>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#1A1A1A' }}>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--ink)' }}>
                 <span className="text-white text-[7px] font-black">B</span>
               </div>
-              <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
+              <span className="font-black text-[var(--ink)] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
             </div>
-            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center hover:bg-[#E8E0D4] transition-colors rounded-full">
-              <X size={14} className="text-[#6B6B6B]" />
+            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center hover:bg-[var(--bg)] transition-colors rounded-full">
+              <X size={14} className="text-[var(--ink-muted)]" />
             </button>
           </div>
 
           {/* Profile */}
           <div className="px-6 py-8 flex flex-col items-center text-center gap-4">
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black text-white"
-              style={{ background: '#1A1A1A' }}
+              className="border-brutal w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black text-white"
+              style={{ background: 'var(--ink)' }}
             >
               {user.avatar_url
                 ? <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
@@ -205,19 +205,19 @@ export default function AuthModal({ open, onClose }: Props) {
             </div>
             <div>
               {(user.first_name || user.last_name) && (
-                <p className="font-black text-[#1A1A1A] text-lg" style={{ letterSpacing: '-0.02em' }}>
+                <p className="font-black text-[var(--ink)] text-lg" style={{ letterSpacing: '-0.02em' }}>
                   {[user.first_name, user.last_name].filter(Boolean).join(' ')}
                 </p>
               )}
-              <p className="text-sm text-[#6B6B6B] font-medium mt-0.5">{user.email}</p>
+              <p className="text-sm text-[var(--ink-muted)] font-medium mt-0.5">{user.email}</p>
             </div>
 
             <div
-              className="w-full flex items-center gap-2.5 p-3.5 mt-2"
-              style={{ background: '#EDE9E1', border: '1px solid rgba(196,168,130,0.3)' }}
+              className="border-brutal-thin w-full flex items-center gap-2.5 p-3.5 mt-2"
+              style={{ background: 'var(--warn)' }}
             >
-              <Sparkles size={12} style={{ color: '#C4A882' }} className="shrink-0" />
-              <p className="text-[11px] text-[#6B6B6B] font-medium text-left leading-snug">
+              <Sparkles size={12} style={{ color: 'var(--ink)' }} className="shrink-0" />
+              <p className="text-[11px] text-[var(--ink)] font-medium text-left leading-snug">
                 Your searches and bookmarks are synced across devices.
               </p>
             </div>
@@ -225,7 +225,7 @@ export default function AuthModal({ open, onClose }: Props) {
 
           {/* Sign out */}
           <div className="px-6 pb-6 flex flex-col gap-2">
-            {error && <p className="text-[11px] text-[#E57373] font-semibold text-center">{error}</p>}
+            {error && <p className="text-[11px] text-[var(--error)] font-semibold text-center">{error}</p>}
             <button
               disabled={logoutLoading}
               onClick={async () => {
@@ -240,11 +240,11 @@ export default function AuthModal({ open, onClose }: Props) {
                   setLogoutLoading(false);
                 }
               }}
-              className="w-full py-3 flex items-center justify-center gap-2 text-sm font-bold text-[#1A1A1A] transition-all hover:bg-[#E8E0D4] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ border: '1.5px solid #D0CCC4' }}
+              className="btn-brutal w-full py-3 flex items-center justify-center gap-2 text-sm font-bold text-[var(--ink)] transition-all duration-150 hover:bg-[var(--bg)] disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: 'var(--surface)' }}
             >
               {logoutLoading
-                ? <span className="flex gap-1">{[0,1,2].map(i=><span key={i} className="w-1.5 h-1.5 bg-[#1A1A1A] rounded-full animate-bounce" style={{animationDelay:`${i*120}ms`}}/>)}</span>
+                ? <span className="flex gap-1">{[0,1,2].map(i=><span key={i} className="w-1.5 h-1.5 bg-[var(--ink)] rounded-full animate-bounce" style={{animationDelay:`${i*120}ms`}}/>)}</span>
                 : <><LogOut size={13} />Sign out</>
               }
             </button>
@@ -289,37 +289,37 @@ export default function AuthModal({ open, onClose }: Props) {
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
-      style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'rgba(17,17,17,0.6)' }}
       onClick={e => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
-        className="w-full max-w-sm animate-fade-slide-up my-auto"
-        style={{ background: '#F2EDE4', boxShadow: '0 32px 80px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.10)' }}
+        className="border-brutal shadow-brutal-lg w-full max-w-sm animate-fade-slide-up my-auto"
+        style={{ background: 'var(--surface)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(212,196,168,0.5)' }}>
+        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '3px solid var(--ink)' }}>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#1A1A1A' }}>
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--ink)' }}>
               <span className="text-white text-[7px] font-black">B</span>
             </div>
-            <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
+            <span className="font-black text-[var(--ink)] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
           </div>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center hover:bg-[#E8E0D4] transition-colors rounded-full">
-            <X size={14} className="text-[#6B6B6B]" />
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center hover:bg-[var(--bg)] transition-colors rounded-full">
+            <X size={14} className="text-[var(--ink-muted)]" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex" style={{ borderBottom: '1px solid rgba(212,196,168,0.5)' }}>
+        <div className="flex" style={{ borderBottom: '3px solid var(--ink)' }}>
           {(['login', 'register'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className="flex-1 py-3 text-[11px] font-black tracking-[0.12em] uppercase transition-all duration-200"
+              className="flex-1 py-3 text-[11px] font-black tracking-[0.12em] uppercase transition-all duration-150"
               style={{
-                color: tab === t ? '#1A1A1A' : '#9B9B9B',
-                borderBottom: tab === t ? '2px solid #1A1A1A' : '2px solid transparent',
-                marginBottom: -1,
+                color: tab === t ? 'var(--ink)' : 'var(--ink-muted)',
+                borderBottom: tab === t ? '3px solid var(--ink)' : '3px solid transparent',
+                marginBottom: -3,
               }}
             >
               {t === 'login' ? 'Sign in' : 'Create account'}
@@ -336,18 +336,18 @@ export default function AuthModal({ open, onClose }: Props) {
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
                 <Field label="Email" type="email" value={loginEmail} onChange={setLoginEmail} placeholder="you@example.com" />
                 <Field label="Password" type="password" value={loginPassword} onChange={setLoginPassword} placeholder="••••••••" />
-                {error && <p className="text-[11px] text-[#E57373] font-semibold -mt-1">{error}</p>}
+                {error && <p className="text-[11px] text-[var(--error)] font-semibold -mt-1">{error}</p>}
                 <button
                   type="submit"
                   disabled={loading || googleLoading}
-                  className="w-full py-3.5 flex items-center justify-center gap-2 font-black text-sm text-white tracking-wide transition-all duration-200 active:scale-[0.98] mt-1"
-                  style={{ background: loading ? '#555' : '#1A1A1A', letterSpacing: '0.06em' }}
+                  className="btn-brutal w-full py-3.5 flex items-center justify-center gap-2 font-black text-sm text-white tracking-wide transition-all duration-150 mt-1"
+                  style={{ background: loading ? 'var(--ink-muted)' : 'var(--ink)', letterSpacing: '0.06em' }}
                 >
                   {loading ? <Dots /> : <><Mail size={13} /> Sign in</>}
                 </button>
-                <p className="text-center text-[11px] text-[#9B9B9B]">
+                <p className="text-center text-[11px] text-[var(--ink-muted)]">
                   No account?{' '}
-                  <button type="button" onClick={() => setTab('register')} className="text-[#1A1A1A] font-bold underline underline-offset-2">
+                  <button type="button" onClick={() => setTab('register')} className="text-[var(--ink)] font-bold underline underline-offset-2">
                     Create one
                   </button>
                 </p>
@@ -365,18 +365,18 @@ export default function AuthModal({ open, onClose }: Props) {
                 <Field label="Email *" type="email" value={regEmail} onChange={setRegEmail} placeholder="you@example.com" />
                 <Field label="Password *" type="password" value={regPassword} onChange={setRegPassword} placeholder="Min. 8 characters" />
                 <Field label="Confirm password *" type="password" value={regPassword2} onChange={setRegPassword2} placeholder="••••••••" />
-                {error && <p className="text-[11px] text-[#E57373] font-semibold -mt-1">{error}</p>}
+                {error && <p className="text-[11px] text-[var(--error)] font-semibold -mt-1">{error}</p>}
                 <button
                   type="submit"
                   disabled={loading || googleLoading}
-                  className="w-full py-3.5 flex items-center justify-center gap-2 font-black text-sm text-white tracking-wide transition-all duration-200 active:scale-[0.98] mt-1"
-                  style={{ background: loading ? '#555' : '#1A1A1A', letterSpacing: '0.06em' }}
+                  className="btn-brutal w-full py-3.5 flex items-center justify-center gap-2 font-black text-sm text-white tracking-wide transition-all duration-150 mt-1"
+                  style={{ background: loading ? 'var(--ink-muted)' : 'var(--ink)', letterSpacing: '0.06em' }}
                 >
                   {loading ? <Dots /> : <><User size={13} /> Create account <ArrowRight size={13} /></>}
                 </button>
-                <p className="text-center text-[11px] text-[#9B9B9B]">
+                <p className="text-center text-[11px] text-[var(--ink-muted)]">
                   Already have one?{' '}
-                  <button type="button" onClick={() => setTab('login')} className="text-[#1A1A1A] font-bold underline underline-offset-2">
+                  <button type="button" onClick={() => setTab('login')} className="text-[var(--ink)] font-bold underline underline-offset-2">
                     Sign in
                   </button>
                 </p>
@@ -387,7 +387,7 @@ export default function AuthModal({ open, onClose }: Props) {
 
         {/* Footer note */}
         <div className="px-6 pb-5">
-          <p className="text-center text-[10px] text-[#AAAAAA] leading-relaxed">
+          <p className="text-center text-[10px] text-[var(--ink-muted)] leading-relaxed">
             Optional — Browse AI works great without an account too.
           </p>
         </div>
