@@ -14,7 +14,7 @@ export default function PageEnterTransition() {
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 9998,
-        background: "#111110",
+        background: "var(--ink)",
         transform: lifted ? "translateY(-100%)" : "translateY(0)",
         transition: lifted ? "transform 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
         pointerEvents: "none",
