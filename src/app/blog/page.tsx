@@ -26,24 +26,24 @@ export default async function BlogIndex() {
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-16">
         <div className="mb-14 max-w-2xl">
           <p
-            className="text-[10px] font-black uppercase tracking-[0.28em] mb-4"
-            style={{ color: "#7A9E74" }}
+            className="font-mono-brutal text-[10px] font-black uppercase tracking-[0.28em] mb-4"
+            style={{ color: "var(--accent)" }}
           >
             Journal
           </p>
           <h1
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-4"
-            style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-4"
+            style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", color: "var(--ink)" }}
           >
             Pakistani Fashion,<br />Decoded
           </h1>
-          <p className="text-base leading-relaxed" style={{ color: "#6B6B6B" }}>
+          <p className="text-base leading-relaxed" style={{ color: "var(--ink-muted)" }}>
             Buying guides, brand deep-dives, and styling advice to help you shop smarter.
           </p>
         </div>
 
         {posts.length === 0 ? (
-          <p className="text-sm" style={{ color: "#AAAAAA" }}>
+          <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             No articles yet — check back soon.
           </p>
         ) : (
@@ -52,52 +52,47 @@ export default async function BlogIndex() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                style={{
-                  background: "#FFFFFF",
-                  border: "1px solid rgba(212,196,168,0.35)",
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-                }}
+                className="card-brutal group flex flex-col overflow-hidden"
               >
                 <div className="relative overflow-hidden" style={{ aspectRatio: i === 0 ? "16/7" : "16/9" }}>
                   <Image
                     src={post.coverImage}
                     alt={post.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-150 ease-out group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div
-                    className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
-                    style={{ background: "#7A9E74", color: "#FFFFFF" }}
+                    className="tag-brutal absolute top-3 left-3"
+                    style={{ background: "var(--accent)", color: "var(--surface)" }}
                   >
                     {post.category}
                   </div>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[11px] font-medium" style={{ color: "#AAAAAA" }}>
+                    <span className="font-mono-brutal text-[11px] font-medium" style={{ color: "var(--ink-muted)" }}>
                       {formatDate(post.date)}
                     </span>
-                    <span style={{ color: "#E0DDD6" }}>·</span>
-                    <span className="text-[11px] font-medium" style={{ color: "#AAAAAA" }}>
+                    <span style={{ color: "var(--ink-muted)" }}>·</span>
+                    <span className="font-mono-brutal text-[11px] font-medium" style={{ color: "var(--ink-muted)" }}>
                       {post.readTime}
                     </span>
                   </div>
                   <h2
-                    className="font-cormorant font-semibold italic leading-tight mb-3 group-hover:text-[#7A9E74] transition-colors"
-                    style={{ fontSize: "1.35rem", color: "#0F0F0E" }}
+                    className="font-display leading-tight mb-3 group-hover:text-[var(--accent)] transition-colors duration-150 ease-out"
+                    style={{ fontSize: "1.35rem", color: "var(--ink)" }}
                   >
                     {post.title}
                   </h2>
-                  <p className="text-sm leading-relaxed flex-1" style={{ color: "#6B6B6B" }}>
+                  <p className="text-sm leading-relaxed flex-1" style={{ color: "var(--ink-muted)" }}>
                     {post.description}
                   </p>
                   <div className="mt-5 flex items-center gap-1.5">
-                    <span className="text-[11px] font-black uppercase tracking-wider" style={{ color: "#7A9E74" }}>
+                    <span className="font-mono-brutal text-[11px] font-black uppercase tracking-wider" style={{ color: "var(--accent)" }}>
                       Read guide
                     </span>
-                    <span className="text-[11px]" style={{ color: "#7A9E74" }}>→</span>
+                    <span className="text-[11px]" style={{ color: "var(--accent)" }}>→</span>
                   </div>
                 </div>
               </Link>

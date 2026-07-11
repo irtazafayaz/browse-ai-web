@@ -12,14 +12,14 @@ export default function PrivacyPage() {
     <PageShell>
       <div className="max-w-3xl mx-auto px-6 md:px-10 py-16">
         <div className="mb-12">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] mb-4" style={{ color: "#7A9E74" }}>Legal</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.28em] mb-4" style={{ color: "var(--accent)" }}>Legal</p>
           <h1
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-3"
-            style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-3"
+            style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: "var(--ink)" }}
           >
             Privacy Policy
           </h1>
-          <p className="text-sm" style={{ color: "#AAAAAA" }}>Last updated: {lastUpdated}</p>
+          <p className="text-sm" style={{ color: "var(--ink-muted)" }}>Last updated: {lastUpdated}</p>
         </div>
 
         <div className="legal-prose">
@@ -93,12 +93,12 @@ export default function PrivacyPage() {
       </div>
 
       <style>{`
-        .legal-prose h2 { font-family: var(--font-cormorant), Georgia, serif; font-size: 1.3rem; font-weight: 600; font-style: italic; color: #0F0F0E; margin: 2rem 0 0.6rem; }
-        .legal-prose h3 { font-size: 0.875rem; font-weight: 700; color: #0F0F0E; margin: 1.2rem 0 0.4rem; }
-        .legal-prose p { font-size: 0.9rem; line-height: 1.8; color: #4A4A4A; margin: 0 0 1rem; }
+        .legal-prose h2 { font-family: var(--font-archivo-black), sans-serif; font-size: 1.3rem; font-weight: 600; color: var(--ink); margin: 2rem 0 0.6rem; }
+        .legal-prose h3 { font-size: 0.875rem; font-weight: 700; color: var(--ink); margin: 1.2rem 0 0.4rem; }
+        .legal-prose p { font-size: 0.9rem; line-height: 1.8; color: var(--ink-muted); margin: 0 0 1rem; }
         .legal-prose ul { margin: 0.5rem 0 1rem 1.4rem; list-style: disc; }
-        .legal-prose li { font-size: 0.88rem; line-height: 1.75; color: #4A4A4A; margin-bottom: 0.3rem; }
-        .legal-prose strong { font-weight: 700; color: #0F0F0E; }
+        .legal-prose li { font-size: 0.88rem; line-height: 1.75; color: var(--ink-muted); margin-bottom: 0.3rem; }
+        .legal-prose strong { font-weight: 700; color: var(--ink); }
       `}</style>
     </PageShell>
   );

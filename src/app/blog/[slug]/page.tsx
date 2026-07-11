@@ -47,7 +47,7 @@ export default async function BlogPostPage({
           <Link
             href="/blog"
             className="text-[11px] font-bold uppercase tracking-wider transition-colors"
-            style={{ color: "#7A9E74" }}
+            style={{ color: "var(--accent)" }}
           >
             ← All articles
           </Link>
@@ -55,30 +55,30 @@ export default async function BlogPostPage({
 
         <div className="mb-8">
           <div
-            className="inline-block px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-4"
-            style={{ background: "#EEF4EE", color: "#4D7A47" }}
+            className="inline-block border-brutal-thin px-2.5 py-1 text-[10px] font-black uppercase tracking-wider mb-4"
+            style={{ background: "var(--accent-soft)", color: "var(--accent-dark)" }}
           >
             {post.category}
           </div>
           <h1
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-4"
-            style={{ fontSize: "clamp(2rem, 4.5vw, 3.2rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-4"
+            style={{ fontSize: "clamp(2rem, 4.5vw, 3.2rem)", color: "var(--ink)" }}
           >
             {post.title}
           </h1>
           <div className="flex items-center gap-3">
-            <span className="text-[12px] font-medium" style={{ color: "#AAAAAA" }}>
+            <span className="text-[12px] font-medium" style={{ color: "var(--ink-muted)" }}>
               {formatDate(post.date)}
             </span>
-            <span style={{ color: "#E0DDD6" }}>·</span>
-            <span className="text-[12px] font-medium" style={{ color: "#AAAAAA" }}>
+            <span style={{ color: "var(--bg)" }}>·</span>
+            <span className="text-[12px] font-medium" style={{ color: "var(--ink-muted)" }}>
               {post.readTime}
             </span>
           </div>
         </div>
 
         <div
-          className="relative w-full rounded-2xl overflow-hidden mb-10"
+          className="relative w-full border-brutal shadow-brutal overflow-hidden mb-10"
           style={{ aspectRatio: "16/7" }}
         >
           <Image
@@ -93,26 +93,26 @@ export default async function BlogPostPage({
 
         <div
           className="prose-custom"
-          style={{ color: "#0F0F0E" }}
+          style={{ color: "var(--ink)" }}
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
         <div
-          className="mt-12 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-4"
-          style={{ background: "#EEF4EE", border: "1px solid rgba(122,158,116,0.25)" }}
+          className="mt-12 p-6 border-brutal shadow-brutal flex flex-col md:flex-row items-start md:items-center gap-4"
+          style={{ background: "var(--accent-soft)" }}
         >
           <div className="flex-1">
-            <p className="font-black text-sm tracking-tight mb-1" style={{ color: "#0F0F0E" }}>
+            <p className="font-black text-sm tracking-tight mb-1" style={{ color: "var(--ink)" }}>
               Ready to find your perfect outfit?
             </p>
-            <p className="text-sm" style={{ color: "#6B6B6B" }}>
+            <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
               Browse AI searches across Pakistan&apos;s top brands in one search.
             </p>
           </div>
           <Link
             href={`/results?q=${encodeURIComponent(post.title)}`}
-            className="shrink-0 px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all hover:opacity-90 active:scale-95"
-            style={{ background: "#7A9E74", color: "#FFFFFF" }}
+            className="btn-brutal btn-brutal-accent shrink-0 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider"
+            style={{ color: "var(--surface)" }}
           >
             Search Now
           </Link>
@@ -122,12 +122,12 @@ export default async function BlogPostPage({
       {related.length > 0 && (
         <div
           className="border-t py-14"
-          style={{ borderColor: "rgba(212,196,168,0.35)" }}
+          style={{ borderColor: "var(--ink)" }}
         >
           <div className="max-w-6xl mx-auto px-6 md:px-10">
             <p
               className="text-[10px] font-black uppercase tracking-[0.28em] mb-8"
-              style={{ color: "#7A9E74" }}
+              style={{ color: "var(--accent)" }}
             >
               More buying guides
             </p>
@@ -136,25 +136,24 @@ export default async function BlogPostPage({
                 <Link
                   key={p.slug}
                   href={`/blog/${p.slug}`}
-                  className="group flex gap-4 items-start p-4 rounded-xl transition-all hover:bg-white"
-                  style={{ border: "1px solid rgba(212,196,168,0.25)" }}
+                  className="group card-brutal flex gap-4 items-start p-4"
                 >
-                  <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                  <div className="relative w-20 h-20 border-brutal-thin overflow-hidden shrink-0">
                     <Image
                       src={p.coverImage}
                       alt={p.title}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="object-cover transition-transform duration-150 ease-out group-hover:scale-105"
                       sizes="80px"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "#AAAAAA" }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--ink-muted)" }}>
                       {p.readTime}
                     </p>
                     <h3
-                      className="font-cormorant font-semibold italic text-base leading-snug group-hover:text-[#7A9E74] transition-colors"
-                      style={{ color: "#0F0F0E" }}
+                      className="font-display text-base leading-snug transition-colors"
+                      style={{ color: "var(--ink)" }}
                     >
                       {p.title}
                     </h3>
@@ -167,12 +166,12 @@ export default async function BlogPostPage({
       )}
 
       <style>{`
-        .prose-custom h2 { font-family: var(--font-cormorant), Georgia, serif; font-size: 1.6rem; font-weight: 600; font-style: italic; color: #0F0F0E; margin: 2.2rem 0 0.8rem; line-height: 1.2; letter-spacing: -0.01em; }
-        .prose-custom h3 { font-size: 1rem; font-weight: 800; color: #0F0F0E; margin: 1.8rem 0 0.5rem; letter-spacing: -0.01em; }
-        .prose-custom p { font-size: 0.96rem; line-height: 1.8; color: #3A3A3A; margin: 0 0 1.1rem; }
+        .prose-custom h2 { font-family: var(--font-archivo-black); font-size: 1.6rem; font-weight: 600; color: var(--ink); margin: 2.2rem 0 0.8rem; line-height: 1.2; letter-spacing: -0.01em; }
+        .prose-custom h3 { font-size: 1rem; font-weight: 800; color: var(--ink); margin: 1.8rem 0 0.5rem; letter-spacing: -0.01em; }
+        .prose-custom p { font-size: 0.96rem; line-height: 1.8; color: var(--ink-muted); margin: 0 0 1.1rem; }
         .prose-custom ul { margin: 0.6rem 0 1.2rem 1.4rem; list-style: disc; }
-        .prose-custom li { font-size: 0.93rem; line-height: 1.75; color: #3A3A3A; margin-bottom: 0.35rem; }
-        .prose-custom strong { font-weight: 700; color: #0F0F0E; }
+        .prose-custom li { font-size: 0.93rem; line-height: 1.75; color: var(--ink-muted); margin-bottom: 0.35rem; }
+        .prose-custom strong { font-weight: 700; color: var(--ink); }
       `}</style>
     </PageShell>
   );

@@ -63,45 +63,45 @@ export default function FaqPage() {
       <div className="max-w-3xl mx-auto px-6 md:px-10 py-16">
         <div className="mb-14">
           <p
-            className="text-[10px] font-black uppercase tracking-[0.28em] mb-4"
-            style={{ color: "#7A9E74" }}
+            className="font-mono-brutal text-[10px] font-black uppercase tracking-[0.28em] mb-4"
+            style={{ color: "var(--accent)" }}
           >
             Help
           </p>
           <h1
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-4"
-            style={{ fontSize: "clamp(2rem, 4.5vw, 3.4rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-4"
+            style={{ fontSize: "clamp(2rem, 4.5vw, 3.4rem)", color: "var(--ink)" }}
           >
             Frequently Asked Questions
           </h1>
-          <p className="text-base leading-relaxed" style={{ color: "#6B6B6B" }}>
+          <p className="text-base leading-relaxed" style={{ color: "var(--ink-muted)" }}>
             Can&apos;t find what you&apos;re looking for?{" "}
-            <Link href="/results" style={{ color: "#7A9E74", fontWeight: 700 }}>
+            <Link href="/results" style={{ color: "var(--accent)", fontWeight: 700 }}>
               Try searching instead →
             </Link>
           </p>
         </div>
 
-        <div className="divide-y" style={{ borderColor: "rgba(212,196,168,0.35)" }}>
+        <div>
           {FAQS.map((faq, i) => (
             <details
               key={i}
-              className="group py-5"
-              style={{ borderColor: "rgba(212,196,168,0.35)" }}
+              className="group py-5 border-brutal-thin border-t-0 border-l-0 border-r-0"
+              style={{ borderColor: "var(--ink)" }}
             >
               <summary
                 className="flex items-center justify-between cursor-pointer list-none font-bold text-sm gap-4"
-                style={{ color: "#0F0F0E" }}
+                style={{ color: "var(--ink)" }}
               >
                 <span className="tracking-tight">{faq.q}</span>
                 <span
-                  className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[13px] transition-transform duration-200 group-open:rotate-45"
-                  style={{ background: "#EEF4EE", color: "#4D7A47" }}
+                  className="shrink-0 w-6 h-6 flex items-center justify-center text-[13px] transition-transform duration-150 ease-out group-open:rotate-45"
+                  style={{ color: "var(--accent-dark)" }}
                 >
                   +
                 </span>
               </summary>
-              <p className="mt-3 text-sm leading-relaxed" style={{ color: "#6B6B6B" }}>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                 {faq.a}
               </p>
             </details>
@@ -109,22 +109,22 @@ export default function FaqPage() {
         </div>
 
         <div
-          className="mt-14 p-7 rounded-2xl"
-          style={{ background: "#EEF4EE", border: "1px solid rgba(122,158,116,0.2)" }}
+          className="mt-14 p-7 border-brutal shadow-brutal"
+          style={{ background: "var(--accent-soft)" }}
         >
           <h2
-            className="font-cormorant font-semibold italic mb-2"
-            style={{ fontSize: "1.4rem", color: "#0F0F0E" }}
+            className="font-display mb-2"
+            style={{ fontSize: "1.4rem", color: "var(--ink)" }}
           >
             Still have questions?
           </h2>
-          <p className="text-sm mb-4" style={{ color: "#6B6B6B" }}>
+          <p className="text-sm mb-4" style={{ color: "var(--ink-muted)" }}>
             The best way to experience Browse AI is to try it. Describe what you&apos;re looking for and see it in action.
           </p>
           <Link
             href="/results"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all hover:opacity-90 active:scale-95"
-            style={{ background: "#7A9E74", color: "#FFFFFF" }}
+            className="btn-brutal-accent inline-flex items-center gap-2 px-5 py-2.5 font-mono-brutal text-[11px] font-black uppercase tracking-wider"
+            style={{ color: "var(--surface)" }}
           >
             Try Browse AI
           </Link>

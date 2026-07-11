@@ -47,35 +47,34 @@ export default function AboutPage() {
           className="py-24 max-w-3xl"
         >
           <p
-            className="text-[10px] font-black uppercase tracking-[0.28em] mb-5"
-            style={{ color: "#7A9E74" }}
+            className="font-mono-brutal text-[10px] font-black uppercase tracking-[0.28em] mb-5"
+            style={{ color: "var(--accent)" }}
           >
             Our Story
           </p>
           <h1
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-6"
-            style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-6"
+            style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", color: "var(--ink)" }}
           >
             Fashion discovery, finally as smart as you are
           </h1>
-          <p className="text-lg leading-relaxed" style={{ color: "#6B6B6B" }}>
+          <p className="text-lg leading-relaxed" style={{ color: "var(--ink-muted)" }}>
             Browse AI was built out of a simple frustration: shopping for Pakistani fashion online shouldn't require visiting ten websites, applying twenty filters, and still not finding what you had in mind. We built the search experience it deserved.
           </p>
         </div>
 
         <div
-          className="py-14 grid grid-cols-2 md:grid-cols-4 gap-8 border-y"
-          style={{ borderColor: "rgba(212,196,168,0.35)" }}
+          className="py-14 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
           {STATS.map((s) => (
-            <div key={s.label}>
+            <div key={s.label} className="card-brutal p-6">
               <p
-                className="font-cormorant font-semibold italic"
-                style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: "#0F0F0E", lineHeight: 1 }}
+                className="font-display"
+                style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: "var(--ink)", lineHeight: 1 }}
               >
                 {s.value}
               </p>
-              <p className="text-[11px] font-semibold uppercase tracking-widest mt-2" style={{ color: "#7A9E74" }}>
+              <p className="font-mono-brutal text-[11px] font-semibold uppercase tracking-widest mt-2" style={{ color: "var(--accent)" }}>
                 {s.label}
               </p>
             </div>
@@ -84,14 +83,14 @@ export default function AboutPage() {
 
         <div className="py-20">
           <p
-            className="text-[10px] font-black uppercase tracking-[0.28em] mb-4"
-            style={{ color: "#7A9E74" }}
+            className="font-mono-brutal text-[10px] font-black uppercase tracking-[0.28em] mb-4"
+            style={{ color: "var(--accent)" }}
           >
             How it works
           </p>
           <h2
-            className="font-cormorant font-semibold italic leading-tight tracking-[-0.02em] mb-14"
-            style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#0F0F0E" }}
+            className="font-display leading-tight tracking-[-0.02em] mb-14"
+            style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "var(--ink)" }}
           >
             Three steps to your perfect outfit
           </h2>
@@ -99,19 +98,18 @@ export default function AboutPage() {
             {STEPS.map((step) => (
               <div
                 key={step.number}
-                className="p-7 rounded-2xl"
-                style={{ background: "#FFFFFF", border: "1px solid rgba(212,196,168,0.35)" }}
+                className="card-brutal p-7"
               >
                 <p
-                  className="font-cormorant font-semibold italic mb-4"
-                  style={{ fontSize: "2.5rem", color: "rgba(122,158,116,0.25)", lineHeight: 1 }}
+                  className="font-display mb-4"
+                  style={{ fontSize: "2.5rem", color: "var(--accent)", lineHeight: 1 }}
                 >
                   {step.number}
                 </p>
-                <h3 className="font-bold text-base mb-2 tracking-tight" style={{ color: "#0F0F0E" }}>
+                <h3 className="font-bold text-base mb-2 tracking-tight" style={{ color: "var(--ink)" }}>
                   {step.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#6B6B6B" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                   {step.body}
                 </p>
               </div>
@@ -120,24 +118,23 @@ export default function AboutPage() {
         </div>
 
         <div
-          className="py-16 border-t flex flex-col md:flex-row items-start md:items-center gap-6"
-          style={{ borderColor: "rgba(212,196,168,0.35)" }}
+          className="py-16 border-t-[3px] flex flex-col md:flex-row items-start md:items-center gap-6"
+          style={{ borderColor: "var(--ink)" }}
         >
           <div className="flex-1">
             <h2
-              className="font-cormorant font-semibold italic leading-tight mb-2"
-              style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: "#0F0F0E" }}
+              className="font-display leading-tight mb-2"
+              style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: "var(--ink)" }}
             >
               Try it yourself
             </h2>
-            <p className="text-sm" style={{ color: "#6B6B6B" }}>
+            <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
               No account needed. Just describe what you&apos;re looking for.
             </p>
           </div>
           <Link
             href="/results"
-            className="px-7 py-3 rounded-full text-sm font-black uppercase tracking-wider transition-all hover:opacity-90 active:scale-95"
-            style={{ background: "#0F0F0E", color: "#FFFFFF" }}
+            className="btn-brutal-accent font-mono-brutal px-7 py-3 text-sm font-black uppercase tracking-wider"
           >
             Start Searching
           </Link>
