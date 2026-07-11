@@ -28,10 +28,10 @@ function RelatedCard({ product, onClick }: { product: Product; onClick: () => vo
       className="shrink-0 w-40 cursor-pointer"
       style={{
         transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
-        transition: 'transform 0.3s cubic-bezier(0.19,1,0.22,1)',
+        transition: 'transform 0.15s ease-out',
       }}
     >
-      <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: '3/4' }}>
+      <div className="relative overflow-hidden border-brutal" style={{ aspectRatio: '3/4' }}>
         <Image
           src={product.imageUrl}
           alt={product.name}
@@ -40,26 +40,26 @@ function RelatedCard({ product, onClick }: { product: Product; onClick: () => vo
           sizes="160px"
           style={{
             transform: hovered ? 'scale(1.07)' : 'scale(1)',
-            transition: 'transform 0.5s cubic-bezier(0.19,1,0.22,1)',
+            transition: 'transform 0.15s ease-out',
           }}
         />
         {discount && (
           <span
-            className="absolute top-2 left-2 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5"
-            style={{ background: '#7A9E74', color: 'white' }}
+            className="absolute top-2 left-2 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 border-brutal-thin"
+            style={{ background: 'var(--accent)', color: 'white' }}
           >
             -{discount}%
           </span>
         )}
       </div>
       <div className="pt-2 px-0.5">
-        <p className="text-[8px] font-black tracking-[0.18em] uppercase" style={{ color: '#7A9E74' }}>
+        <p className="text-[8px] font-black tracking-[0.18em] uppercase" style={{ color: 'var(--accent)' }}>
           {product.brand}
         </p>
-        <p className="text-[11px] font-semibold text-[#1A1A1A] leading-snug mt-0.5 line-clamp-1">
+        <p className="text-[11px] font-semibold leading-snug mt-0.5 line-clamp-1" style={{ color: 'var(--ink)' }}>
           {product.name}
         </p>
-        <p className="text-[12px] font-black text-[#1A1A1A] mt-1">${product.price}</p>
+        <p className="text-[12px] font-black mt-1" style={{ color: 'var(--ink)' }}>${product.price}</p>
       </div>
     </div>
   );
@@ -146,10 +146,10 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#FAFAF8' }}>
+      <div className="flex h-screen items-center justify-center" style={{ background: 'var(--bg)' }}>
         <div className="flex gap-2 items-center">
           {[0, 1, 2].map(i => (
-            <span key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#7A9E74', animationDelay: `${i * 150}ms` }} />
+            <span key={i} className="w-2 h-2 animate-bounce" style={{ background: 'var(--accent)', animationDelay: `${i * 150}ms` }} />
           ))}
         </div>
       </div>
@@ -158,10 +158,10 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#FAFAF8' }}>
+      <div className="flex h-screen items-center justify-center" style={{ background: 'var(--bg)' }}>
         <div className="text-center">
-          <p className="font-black text-[#1A1A1A] text-lg">Product not found</p>
-          <button onClick={() => router.back()} className="mt-4 text-sm text-[#7A9E74] underline">
+          <p className="font-black text-lg" style={{ color: 'var(--ink)' }}>Product not found</p>
+          <button onClick={() => router.back()} className="mt-4 text-sm underline" style={{ color: 'var(--accent)' }}>
             Go back
           </button>
         </div>
@@ -170,47 +170,47 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAFAF8' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
 
       {/* ── Sticky top bar ── */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-4 py-3"
         style={{
-          background: 'rgba(250,250,248,0.94)',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          borderBottom: '1px solid rgba(230,226,218,0.3)',
+          background: 'var(--surface)',
+          borderBottom: '3px solid var(--ink)',
         }}
       >
         <button
           onClick={() => router.back()}
-          className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all duration-200"
+          className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-all duration-150 ease-out"
+          style={{ background: 'var(--accent-soft)' }}
         >
-          <ArrowLeft size={16} className="text-[#1A1A1A]" />
+          <ArrowLeft size={16} style={{ color: 'var(--ink)' }} />
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#1A1A1A' }}>
+          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--ink)' }}>
             <span className="text-white text-[8px] font-black">B</span>
           </div>
-          <span className="font-black text-[#1A1A1A] text-sm" style={{ letterSpacing: '-0.02em' }}>Browse AI</span>
+          <span className="font-black text-sm" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Browse AI</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all duration-200">
-            <Share2 size={14} className="text-[#1A1A1A]" />
+          <button className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-all duration-150 ease-out" style={{ background: 'var(--accent-soft)' }}>
+            <Share2 size={14} style={{ color: 'var(--ink)' }} />
           </button>
           <button
             onClick={handleBookmarkToggle}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#E8E0D4] active:scale-90 transition-all duration-200"
+            className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-all duration-150 ease-out"
             style={{
+              background: 'var(--accent-soft)',
               transform: bookmarked ? 'scale(1.1)' : 'scale(1)',
               transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)',
             }}
           >
             {bookmarked
-              ? <BookmarkCheck size={14} className="text-[#1A1A1A]" />
-              : <Bookmark size={14} className="text-[#6B6B6B]" />
+              ? <BookmarkCheck size={14} style={{ color: 'var(--ink)' }} />
+              : <Bookmark size={14} style={{ color: 'var(--ink-muted)' }} />
             }
           </button>
         </div>
@@ -224,12 +224,12 @@ export default function ProductDetailPage() {
           <div className="lg:w-[52%] shrink-0">
             {/* Hero image */}
             <div
-              className="relative overflow-hidden"
+              className="relative overflow-hidden border-brutal shadow-brutal-lg"
               style={{
                 aspectRatio: '3/4',
-                background: '#EEF4EE',
+                background: 'var(--accent-soft)',
                 opacity: imageLoaded ? 1 : 0,
-                transition: 'opacity 0.5s ease',
+                transition: 'opacity 0.35s ease',
               }}
             >
               <Image
@@ -244,8 +244,8 @@ export default function ProductDetailPage() {
               {/* Discount badge */}
               {discount && (
                 <div
-                  className="absolute top-4 left-4 text-[10px] font-black tracking-widest uppercase px-2.5 py-1"
-                  style={{ background: '#0F0F0E', color: 'white', letterSpacing: '0.12em' }}
+                  className="absolute top-4 left-4 text-[10px] font-black tracking-widest uppercase px-2.5 py-1 border-brutal-thin"
+                  style={{ background: 'var(--ink)', color: 'white', letterSpacing: '0.12em' }}
                 >
                   -{discount}% OFF
                 </div>
@@ -261,13 +261,13 @@ export default function ProductDetailPage() {
               ].map((url, i) => (
                 <div
                   key={i}
-                  className="relative overflow-hidden cursor-pointer flex-1"
+                  className="relative overflow-hidden cursor-pointer flex-1 border-brutal-thin"
                   style={{
                     aspectRatio: '3/4',
-                    background: '#EEF4EE',
-                    outline: i === 0 ? '2px solid #7A9E74' : '2px solid transparent',
+                    background: 'var(--accent-soft)',
+                    outline: i === 0 ? '2px solid var(--accent)' : '2px solid transparent',
                     outlineOffset: '1px',
-                    transition: 'outline 0.15s ease',
+                    transition: 'outline 0.15s ease-out',
                   }}
                 >
                   <Image
@@ -288,33 +288,35 @@ export default function ProductDetailPage() {
             {/* Brand + name + price */}
             <div
               ref={info.ref}
+              className="card-brutal p-5"
               style={{
                 opacity: info.visible ? 1 : 0,
                 transform: info.visible ? 'translateY(0)' : 'translateY(24px)',
-                transition: 'opacity 0.55s cubic-bezier(0.19,1,0.22,1), transform 0.6s cubic-bezier(0.19,1,0.22,1)',
+                transition: 'opacity 0.38s cubic-bezier(0.4,0,0.2,1), transform 0.42s cubic-bezier(0.4,0,0.2,1)',
               }}
             >
               {/* Breadcrumb */}
               <div className="flex items-center gap-1.5 mb-4">
                 <button
                   onClick={() => router.push('/results')}
-                  className="text-[10px] font-semibold text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors"
+                  className="text-[10px] font-semibold transition-colors"
+                  style={{ color: 'var(--ink-muted)' }}
                 >
                   Results
                 </button>
-                <ChevronRight size={10} className="text-[#CCCCCC]" />
-                <span className="text-[10px] font-semibold text-[#1A1A1A]">{product.brand}</span>
+                <ChevronRight size={10} style={{ color: 'var(--ink-muted)' }} />
+                <span className="text-[10px] font-semibold" style={{ color: 'var(--ink)' }}>{product.brand}</span>
               </div>
 
               <p
                 className="text-[10px] font-black tracking-[0.22em] uppercase mb-2"
-                style={{ color: '#7A9E74' }}
+                style={{ color: 'var(--accent)' }}
               >
                 {product.brand}
               </p>
               <h1
-                className="font-black text-[#1A1A1A] leading-[1.05] mb-4"
-                style={{ fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)', letterSpacing: '-0.02em', fontFamily: 'var(--font-cormorant), Georgia, serif', fontStyle: 'italic' }}
+                className="font-display leading-[1.05] mb-4"
+                style={{ fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)', letterSpacing: '-0.02em', color: 'var(--ink)' }}
               >
                 {product.name}
               </h1>
@@ -322,19 +324,19 @@ export default function ProductDetailPage() {
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span
-                  className="font-black text-[#1A1A1A]"
-                  style={{ fontSize: '1.6rem', letterSpacing: '-0.03em' }}
+                  className="font-display"
+                  style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', color: 'var(--ink)' }}
                 >
                   ${product.price}
                 </span>
                 {product.originalPrice && (
                   <>
-                    <span className="text-base text-[#BBBBBB] line-through font-medium">
+                    <span className="text-base line-through font-medium" style={{ color: 'var(--ink-muted)' }}>
                       ${product.originalPrice}
                     </span>
                     <span
-                      className="text-xs font-black px-2 py-0.5"
-                      style={{ background: '#0F0F0E', color: 'white', letterSpacing: '0.08em' }}
+                      className="text-xs font-black px-2 py-0.5 border-brutal-thin"
+                      style={{ background: 'var(--ink)', color: 'white', letterSpacing: '0.08em' }}
                     >
                       -{discount}%
                     </span>
@@ -347,8 +349,8 @@ export default function ProductDetailPage() {
                 {product.tags.slice(0, 5).map(tag => (
                   <span
                     key={tag}
-                    className="text-[10px] font-semibold px-2.5 py-1 capitalize"
-                    style={{ background: '#EEF4EE', color: '#58574F' }}
+                    className="text-[10px] font-semibold px-2.5 py-1 capitalize border-brutal-thin"
+                    style={{ background: 'var(--accent-soft)', color: 'var(--ink-muted)' }}
                   >
                     {tag}
                   </span>
@@ -359,21 +361,21 @@ export default function ProductDetailPage() {
             {/* Size + quantity + CTA */}
             <div
               ref={actions.ref}
-              className="flex flex-col gap-5"
+              className="card-brutal p-5 flex flex-col gap-5"
               style={{
                 opacity: actions.visible ? 1 : 0,
                 transform: actions.visible ? 'translateY(0)' : 'translateY(24px)',
-                transition: 'opacity 0.55s cubic-bezier(0.19,1,0.22,1), transform 0.6s cubic-bezier(0.19,1,0.22,1)',
+                transition: 'opacity 0.38s cubic-bezier(0.4,0,0.2,1), transform 0.42s cubic-bezier(0.4,0,0.2,1)',
               }}
             >
               {/* Divider */}
-              <div style={{ height: 1, background: 'rgba(230,226,218,0.5)' }} />
+              <div style={{ height: 3, background: 'var(--ink)' }} />
 
               {/* Size selector */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[11px] font-black tracking-[0.15em] uppercase text-[#1A1A1A]">Size</p>
-                  <button className="text-[10px] font-semibold text-[#7A9E74] underline underline-offset-2">
+                  <p className="text-[11px] font-black tracking-[0.15em] uppercase" style={{ color: 'var(--ink)' }}>Size</p>
+                  <button className="text-[10px] font-semibold underline underline-offset-2" style={{ color: 'var(--accent)' }}>
                     Size guide
                   </button>
                 </div>
@@ -382,11 +384,11 @@ export default function ProductDetailPage() {
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className="w-10 h-10 text-[11px] font-bold transition-all duration-200 active:scale-95"
+                      className="w-10 h-10 text-[11px] font-bold transition-all duration-150 ease-out active:scale-95"
                       style={{
-                        background: selectedSize === size ? '#7A9E74' : 'transparent',
-                        color: selectedSize === size ? 'white' : '#1A1A1A',
-                        border: `1.5px solid ${selectedSize === size ? '#7A9E74' : '#D0CCC4'}`,
+                        background: selectedSize === size ? 'var(--accent)' : 'transparent',
+                        color: selectedSize === size ? 'white' : 'var(--ink)',
+                        border: `2px solid var(--ink)`,
                       }}
                     >
                       {size}
@@ -394,33 +396,33 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
                 {!selectedSize && (
-                  <p className="text-[10px] text-[#AAAAAA] mt-2 font-medium">Select a size to continue</p>
+                  <p className="text-[10px] mt-2 font-medium" style={{ color: 'var(--ink-muted)' }}>Select a size to continue</p>
                 )}
               </div>
 
               {/* Quantity */}
               <div>
-                <p className="text-[11px] font-black tracking-[0.15em] uppercase text-[#1A1A1A] mb-3">Quantity</p>
+                <p className="text-[11px] font-black tracking-[0.15em] uppercase mb-3" style={{ color: 'var(--ink)' }}>Quantity</p>
                 <div className="flex items-center gap-0" style={{ width: 'fit-content' }}>
                   <button
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-9 h-9 flex items-center justify-center transition-colors hover:bg-[#E8E0D4] active:scale-90"
-                    style={{ border: '1.5px solid #D0CCC4' }}
+                    className="w-9 h-9 flex items-center justify-center transition-all duration-150 ease-out active:scale-90"
+                    style={{ border: '2px solid var(--ink)', background: 'var(--accent-soft)' }}
                   >
-                    <Minus size={12} className="text-[#1A1A1A]" />
+                    <Minus size={12} style={{ color: 'var(--ink)' }} />
                   </button>
                   <div
-                    className="w-12 h-9 flex items-center justify-center font-black text-sm text-[#1A1A1A]"
-                    style={{ borderTop: '1.5px solid #D0CCC4', borderBottom: '1.5px solid #D0CCC4' }}
+                    className="w-12 h-9 flex items-center justify-center font-black text-sm"
+                    style={{ borderTop: '2px solid var(--ink)', borderBottom: '2px solid var(--ink)', color: 'var(--ink)' }}
                   >
                     {quantity}
                   </div>
                   <button
                     onClick={() => setQuantity(q => q + 1)}
-                    className="w-9 h-9 flex items-center justify-center transition-colors hover:bg-[#E8E0D4] active:scale-90"
-                    style={{ border: '1.5px solid #D0CCC4' }}
+                    className="w-9 h-9 flex items-center justify-center transition-all duration-150 ease-out active:scale-90"
+                    style={{ border: '2px solid var(--ink)', background: 'var(--accent-soft)' }}
                   >
-                    <Plus size={12} className="text-[#1A1A1A]" />
+                    <Plus size={12} style={{ color: 'var(--ink)' }} />
                   </button>
                 </div>
               </div>
@@ -430,9 +432,9 @@ export default function ProductDetailPage() {
                 <button
                   onClick={handleAddToBag}
                   disabled={!selectedSize}
-                  className="w-full py-4 font-black text-sm tracking-[0.1em] uppercase flex items-center justify-center gap-2.5 transition-all duration-300 active:scale-[0.98]"
+                  className="w-full py-4 font-black text-sm tracking-[0.1em] uppercase flex items-center justify-center gap-2.5 transition-all duration-150 ease-out active:scale-[0.98] border-brutal shadow-brutal"
                   style={{
-                    background: addedToBag ? '#4D7A47' : selectedSize ? '#7A9E74' : '#C0BDB6',
+                    background: addedToBag ? 'var(--accent-dark)' : selectedSize ? 'var(--accent)' : 'var(--ink-muted)',
                     color: 'white',
                     letterSpacing: '0.12em',
                     cursor: selectedSize ? 'pointer' : 'not-allowed',
@@ -450,11 +452,10 @@ export default function ProductDetailPage() {
 
                 <button
                   onClick={handleBookmarkToggle}
-                  className="w-full py-3.5 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] hover:bg-[#E8E0D4]"
+                  className="w-full py-3.5 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all duration-150 ease-out active:scale-[0.98] border-brutal shadow-brutal"
                   style={{
-                    background: 'transparent',
-                    color: '#1A1A1A',
-                    border: '1.5px solid #D0CCC4',
+                    background: 'var(--surface)',
+                    color: 'var(--ink)',
                     letterSpacing: '0.04em',
                   }}
                 >
@@ -467,17 +468,17 @@ export default function ProductDetailPage() {
 
               {/* AI suggestion strip */}
               <div
-                className="flex items-center gap-3 p-3.5"
-                style={{ background: '#EEF4EE', border: '1px solid rgba(122,158,116,0.25)' }}
+                className="flex items-center gap-3 p-3.5 border-brutal shadow-brutal-sm"
+                style={{ background: 'var(--accent-soft)' }}
               >
                 <div
                   className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center"
-                  style={{ background: '#EEF4EE' }}
+                  style={{ background: 'var(--warn)' }}
                 >
-                  <Sparkles size={11} style={{ color: '#7A9E74' }} />
+                  <Sparkles size={11} style={{ color: 'var(--ink)' }} />
                 </div>
-                <p className="text-[11px] font-medium text-[#58574F] leading-snug">
-                  <span className="font-black text-[#1A1A1A]">Browse AI says: </span>
+                <p className="text-[11px] font-medium leading-snug" style={{ color: 'var(--ink-muted)' }}>
+                  <span className="font-black" style={{ color: 'var(--ink)' }}>Browse AI says: </span>
                   Pairs well with a fitted turtleneck and loafers for an elevated everyday look.
                 </p>
               </div>
@@ -490,11 +491,11 @@ export default function ProductDetailPage() {
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-[#7A9E74]" />
-                      <span className="text-[11px] font-semibold text-[#1A1A1A]">{item.label}</span>
-                      <span className="text-[11px] text-[#9B9B9B]">{item.sub}</span>
+                      <div className="w-1.5 h-1.5" style={{ background: 'var(--accent)' }} />
+                      <span className="text-[11px] font-semibold" style={{ color: 'var(--ink)' }}>{item.label}</span>
+                      <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{item.sub}</span>
                     </div>
-                    <ArrowUpRight size={11} className="text-[#CCCCCC]" />
+                    <ArrowUpRight size={11} style={{ color: 'var(--ink-muted)' }} />
                   </div>
                 ))}
               </div>
@@ -510,23 +511,23 @@ export default function ProductDetailPage() {
             style={{
               opacity: related.visible ? 1 : 0,
               transform: related.visible ? 'translateY(0)' : 'translateY(24px)',
-              transition: 'opacity 0.6s cubic-bezier(0.19,1,0.22,1), transform 0.65s cubic-bezier(0.19,1,0.22,1)',
+              transition: 'opacity 0.42s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1)',
             }}
           >
             {/* Section header */}
-            <div className="flex items-end justify-between mb-5" style={{ borderBottom: '1px solid rgba(230,226,218,0.4)', paddingBottom: '12px' }}>
+            <div className="flex items-end justify-between mb-5" style={{ borderBottom: '3px solid var(--ink)', paddingBottom: '12px' }}>
               <div>
-                <p className="text-[9px] font-black tracking-[0.22em] uppercase mb-1" style={{ color: '#7A9E74' }}>
+                <p className="text-[9px] font-black tracking-[0.22em] uppercase mb-1" style={{ color: 'var(--accent)' }}>
                   You may also like
                 </p>
-                <h2 className="font-black text-[#1A1A1A] text-xl" style={{ letterSpacing: '-0.03em' }}>
+                <h2 className="font-display text-xl" style={{ letterSpacing: '-0.03em', color: 'var(--ink)' }}>
                   Similar Styles
                 </h2>
               </div>
               <button
                 onClick={() => router.push('/results')}
-                className="flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase text-[#7A9E74] hover:text-[#1A1A1A] transition-colors"
-                style={{ letterSpacing: '0.1em' }}
+                className="flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase transition-colors"
+                style={{ letterSpacing: '0.1em', color: 'var(--accent)' }}
               >
                 View all <ArrowUpRight size={12} />
               </button>
