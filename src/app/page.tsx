@@ -9,9 +9,7 @@ import Logo from "@/components/Logo";
 import EditCard from "@/components/EditCard";
 import AuthModal from "@/components/AuthModal";
 import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
-import CursorGlow from "@/components/ui/CursorGlow";
 import PageEnterTransition from "@/components/ui/PageEnterTransition";
-import AmbientOrbs from "@/components/ui/AmbientOrbs";
 import CardTilt from "@/components/ui/CardTilt";
 import CharReveal from "@/components/ui/CharReveal";
 import WordReveal from "@/components/ui/WordReveal";
@@ -82,11 +80,9 @@ export default function LandingPage() {
     router.push(`/results?q=${encodeURIComponent(edit.label)}`);
 
   return (
-    <div className="relative bg-[#FAFAF8] overflow-x-hidden">
+    <div className="relative bg-[var(--bg)] overflow-x-hidden">
       <ScrollProgressBar />
-      <CursorGlow />
       <PageEnterTransition />
-      <AmbientOrbs />
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-6 max-w-7xl mx-auto">
@@ -117,7 +113,7 @@ export default function LandingPage() {
               key={href}
               href={href}
               className="text-[11px] font-black uppercase tracking-[0.14em] transition-colors duration-200 hover:opacity-60"
-              style={{ color: "#0F0F0E" }}
+              style={{ color: "var(--ink)" }}
             >
               {label}
             </Link>
@@ -136,7 +132,7 @@ export default function LandingPage() {
             <button
               onClick={() => setAuthOpen(true)}
               className="w-8 h-8 rounded-full flex items-center justify-center font-black text-white text-xs transition-all duration-200 hover:scale-105 active:scale-95"
-              style={{ background: "#0F0F0E" }}
+              style={{ background: "var(--ink)" }}
               title={user.email}
             >
               {user.avatar_url ? (
@@ -159,24 +155,15 @@ export default function LandingPage() {
               onClick={() => setAuthOpen(true)}
               onMouseMove={onSignInMove}
               onMouseLeave={onSignInLeave}
-              className="btn-dual text-[11px] font-black tracking-wide uppercase"
+              className="btn-brutal text-[11px]"
               style={{
-                border: "1.5px solid #0F0F0E",
-                color: "#0F0F0E",
-                letterSpacing: "0.08em",
                 height: "34px",
                 width: "80px",
                 transform: `translate(${signInMag.x}px, ${signInMag.y}px)`,
-                transition: "transform 0.4s cubic-bezier(0.165,0.84,0.44,1)",
+                transition: "transform 0.15s ease-out",
               }}
             >
-              <span className="txt-a">Sign in</span>
-              <span
-                className="txt-b"
-                style={{ background: "#0F0F0E", color: "white" }}
-              >
-                Sign in
-              </span>
+              <span>Sign in</span>
             </button>
           )}
         </div>
@@ -193,33 +180,30 @@ export default function LandingPage() {
                 transitionDelay: "150ms",
               }}
             >
-              <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 animate-pulse-glow">
-                <Sparkles size={12} style={{ color: "#7A9E74" }} />
-                <span className="text-[10px] font-bold text-[#0F0F0E] tracking-widest uppercase">
+              <div className="inline-flex items-center gap-2 border-brutal shadow-brutal-sm px-4 py-2" style={{ background: 'var(--surface)' }}>
+                <Sparkles size={12} style={{ color: "var(--accent)" }} />
+                <span className="text-[10px] font-bold text-[var(--ink)] tracking-widest uppercase">
                   AI-Powered Fashion Discovery
                 </span>
               </div>
             </div>
 
             <h1
-              className="font-cormorant font-semibold text-[#0F0F0E] leading-[0.90] tracking-[-0.02em] mb-7"
+              className="font-display text-[var(--ink)] leading-[0.90] tracking-[-0.02em] mb-7"
               style={{ fontSize: "clamp(3.6rem, 7.5vw, 6.4rem)" }}
             >
-              <span className="block" style={{ fontStyle: "normal" }}>
+              <span className="block">
                 <CharReveal text="Shop with" baseDelay={180} />
               </span>
-              <span className="block" style={{ fontStyle: "italic" }}>
+              <span className="block">
                 <CharReveal text="words," baseDelay={460} />
               </span>
-              <span
-                className="block"
-                style={{ fontStyle: "normal", color: "#9B9B94" }}
-              >
+              <span className="block" style={{ color: "var(--ink-muted)" }}>
                 <CharReveal text="not filters." baseDelay={700} />
               </span>
             </h1>
 
-            <p className="text-[#58574F] text-base leading-relaxed max-w-[360px] mb-7">
+            <p className="text-[var(--ink-muted)] text-base leading-relaxed max-w-[360px] mb-7">
               <WordReveal
                 text="Describe what you're looking for in plain English — our AI finds perfect pieces from Pakistan's finest brands instantly."
                 baseDelay={1050}
@@ -237,13 +221,13 @@ export default function LandingPage() {
               ].map((url, i) => (
                 <div
                   key={i}
-                  className="relative overflow-hidden rounded-2xl flex-1"
+                  className="relative overflow-hidden flex-1"
                   style={{
                     aspectRatio: "3/4",
                     maxWidth: 130,
                     opacity: mounted ? 1 : 0,
                     transform: mounted ? "translateY(0)" : "translateY(20px)",
-                    transition: `opacity 0.6s ease ${900 + i * 80}ms, transform 0.6s cubic-bezier(0.19,1,0.22,1) ${900 + i * 80}ms`,
+                    transition: `opacity 0.6s ease ${900 + i * 80}ms, transform 0.15s ease-out ${900 + i * 80}ms`,
                   }}
                 >
                   <Image
@@ -268,8 +252,8 @@ export default function LandingPage() {
               className="hidden md:flex items-center gap-2 mt-6 transition-all duration-700"
               style={{ opacity: mounted ? 0.45 : 0, transitionDelay: "1100ms" }}
             >
-              <div className="w-px h-6 bg-gradient-to-b from-[#AAAAAA] to-transparent" />
-              <span className="text-[9px] font-bold tracking-[0.25em] uppercase text-[#AAAAAA]">
+              <div className="w-px h-6 bg-gradient-to-b from-[var(--ink-muted)] to-transparent" />
+              <span className="text-[9px] font-bold tracking-[0.25em] uppercase text-[var(--ink-muted)]">
                 Scroll to explore
               </span>
             </div>
@@ -291,7 +275,7 @@ export default function LandingPage() {
       </section>
 
       <section
-        className="relative z-10 py-24 px-6 md:px-12 border-t border-b border-[#E6E2DA]"
+        className="relative z-10 py-24 px-6 md:px-12 border-t border-b border-[var(--bg)]"
         ref={statsReveal.ref}
       >
         <div className="max-w-7xl mx-auto">
@@ -326,8 +310,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative z-10 py-8 overflow-hidden bg-[#111110]">
-        <div className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#666] text-center mb-4">
+      <section className="relative z-10 py-8 overflow-hidden bg-[var(--ink)]">
+        <div className="text-[9px] font-bold tracking-[0.3em] uppercase text-[var(--ink-muted)] text-center mb-4">
           Featured brands
         </div>
         <MarqueeBrands dark />
@@ -358,7 +342,7 @@ export default function LandingPage() {
       </section>
 
       <section
-        className="relative z-10 py-24 px-6 md:px-12 bg-[#111110]"
+        className="relative z-10 py-24 px-6 md:px-12 bg-[var(--ink)]"
         ref={editsReveal.ref}
       >
         <div className="max-w-7xl mx-auto">
@@ -370,7 +354,7 @@ export default function LandingPage() {
               visible={editsReveal.visible}
             />
             <span
-              className="text-xs text-[#666] font-semibold uppercase tracking-widest hidden md:block"
+              className="text-xs text-[var(--ink-muted)] font-semibold uppercase tracking-widest hidden md:block"
               style={{
                 opacity: editsReveal.visible ? 1 : 0,
                 transition: "opacity 0.7s 0.4s",
@@ -399,15 +383,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="relative z-10 border-t border-[#E6E2DA] py-8 px-6 md:px-12">
+      <footer className="relative z-10 border-t border-[var(--bg)] py-8 px-6 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Logo size="xs" />
-            <span className="text-sm text-[#AAAAAA]">
+            <span className="text-sm text-[var(--ink-muted)]">
               · Fashion discovery, reimagined
             </span>
           </div>
-          <span className="text-xs text-[#AAAAAA]">
+          <span className="text-xs text-[var(--ink-muted)]">
             © 2025 Browse AI. All rights reserved.
           </span>
         </div>

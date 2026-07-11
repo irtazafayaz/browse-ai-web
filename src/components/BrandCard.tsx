@@ -1,20 +1,20 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 export const BRAND_STYLE: Record<
   string,
   { bg: string; text: string; mono: string; tag: string }
 > = {
-  "Sana Safinaz":    { bg: "#E6EEE3", text: "#3D6138", mono: "SS",  tag: "Luxury Pret" },
-  "Alkaram Studio":  { bg: "#F0E8DF", text: "#7A5540", mono: "AS",  tag: "Lawn & Casuals" },
-  "Gul Ahmed":       { bg: "#F5EDD8", text: "#8A6010", mono: "GA",  tag: "Heritage Fabrics" },
-  "Nishat Linen":    { bg: "#DDE7F0", text: "#25527A", mono: "NL",  tag: "Premium Basics" },
-  "Maria B":         { bg: "#F0E2E2", text: "#7A3535", mono: "MB",  tag: "Luxury Formal" },
-  Limelight:         { bg: "#E2F0E6", text: "#28663E", mono: "LL",  tag: "Everyday Pret" },
-  Generation:        { bg: "#F0E6DE", text: "#8B3E12", mono: "GN",  tag: "Sustainable Fashion" },
-  "Bonanza Satrangi":{ bg: "#EDE2F0", text: "#652A7A", mono: "BS",  tag: "Colorful Pret" },
-  ONE:               { bg: "#E8E8E8", text: "#2A2A2A", mono: "ONE", tag: "Contemporary" },
-  Engine:            { bg: "#DDE2F0", text: "#1E3575", mono: "ENG", tag: "Urban Fashion" },
+  "Sana Safinaz":    { bg: "#3D6138", text: "#E6EEE3", mono: "SS",  tag: "Luxury Pret" },
+  "Alkaram Studio":  { bg: "#7A5540", text: "#F0E8DF", mono: "AS",  tag: "Lawn & Casuals" },
+  "Gul Ahmed":       { bg: "#8A6010", text: "#F5EDD8", mono: "GA",  tag: "Heritage Fabrics" },
+  "Nishat Linen":    { bg: "#25527A", text: "#DDE7F0", mono: "NL",  tag: "Premium Basics" },
+  "Maria B":         { bg: "#7A3535", text: "#F0E2E2", mono: "MB",  tag: "Luxury Formal" },
+  Limelight:         { bg: "#28663E", text: "#E2F0E6", mono: "LL",  tag: "Everyday Pret" },
+  Generation:        { bg: "#8B3E12", text: "#F0E6DE", mono: "GN",  tag: "Sustainable Fashion" },
+  "Bonanza Satrangi":{ bg: "#652A7A", text: "#EDE2F0", mono: "BS",  tag: "Colorful Pret" },
+  ONE:               { bg: "#2A2A2A", text: "#E8E8E8", mono: "ONE", tag: "Contemporary" },
+  Engine:            { bg: "#1E3575", text: "#DDE2F0", mono: "ENG", tag: "Urban Fashion" },
 };
 
 export default function BrandCard({
@@ -29,24 +29,10 @@ export default function BrandCard({
   onSearch: (q: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
-  const [mag, setMag] = useState({ x: 0, y: 0 });
-  const btnRef = useRef<HTMLButtonElement>(null);
 
   const style = BRAND_STYLE[brand.name] ?? {
-    bg: "#EDE8E0", text: "#6B5540", mono: brand.name[0], tag: "Fashion Brand",
+    bg: "#6B5540", text: "#EDE8E0", mono: brand.name[0], tag: "Fashion Brand",
   };
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    const el = btnRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    setMag({
-      x: (e.clientX - (r.left + r.width / 2)) * 0.14,
-      y: (e.clientY - (r.top + r.height / 2)) * 0.14,
-    });
-    setHovered(true);
-  };
-  const onMouseLeave = () => { setHovered(false); setMag({ x: 0, y: 0 }); };
 
   return (
     <div
@@ -58,34 +44,32 @@ export default function BrandCard({
       }}
     >
       <button
-        ref={btnRef}
         onClick={() => onSearch(brand.name)}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
-        className="relative flex flex-row items-center w-full rounded-2xl overflow-hidden text-left gap-3"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="relative flex flex-row items-center w-full overflow-hidden text-left gap-3"
         style={{
-          background: hovered ? "#EDEAE4" : "#E8E3DC",
-          border: hovered ? "1px solid rgba(0,0,0,0.10)" : "1px solid rgba(0,0,0,0.06)",
-          boxShadow: hovered ? "0 10px 32px rgba(0,0,0,0.10)" : "0 2px 8px rgba(0,0,0,0.05)",
+          background: hovered ? "var(--accent-soft)" : "var(--surface)",
+          border: "3px solid var(--ink)",
+          boxShadow: hovered ? "4px 4px 0 var(--ink)" : "2px 2px 0 var(--ink)",
           padding: "10px 12px 10px 10px",
-          transform: `translate(${mag.x}px, ${hovered ? mag.y - 3 : 0}px)`,
-          transition: "background 0.2s, box-shadow 0.2s, border 0.2s, transform 0.35s cubic-bezier(0.165,0.84,0.44,1)",
+          transform: hovered ? "translate(-2px, -2px)" : "translate(0, 0)",
+          transition: "background 0.2s, box-shadow 0.2s, transform 0.15s ease-out",
         }}
       >
         <div
-          className="shrink-0 flex items-center justify-center rounded-xl"
+          className="shrink-0 flex items-center justify-center"
           style={{
-            width: 52, height: 52, background: "#0F0F0E",
-            boxShadow: hovered ? "0 6px 18px rgba(0,0,0,0.30)" : "0 3px 10px rgba(0,0,0,0.20)",
-            transition: "box-shadow 0.2s",
+            width: 52, height: 52, background: style.bg,
+            border: "3px solid var(--ink)",
           }}
         >
           <span
+            className="font-display"
             style={{
-              fontFamily: "var(--font-playfair), Georgia, serif",
-              fontStyle: "italic", fontWeight: 700,
+              fontWeight: 700,
               fontSize: style.mono.length > 2 ? "11px" : "18px",
-              letterSpacing: "0.02em", color: style.bg,
+              letterSpacing: "0.02em", color: "var(--surface)",
             }}
           >
             {style.mono}
@@ -95,13 +79,13 @@ export default function BrandCard({
         <div className="flex flex-col min-w-0 flex-1">
           <span
             className="font-black uppercase leading-tight truncate"
-            style={{ fontSize: "9.5px", letterSpacing: "0.10em", color: "#0F0F0E" }}
+            style={{ fontSize: "9.5px", letterSpacing: "0.10em", color: "var(--ink)" }}
           >
             {brand.name}
           </span>
           <span
-            className="font-semibold uppercase truncate mt-0.5"
-            style={{ fontSize: "7.5px", letterSpacing: "0.14em", color: "#7A9E74" }}
+            className="font-mono-brutal font-semibold uppercase truncate mt-0.5"
+            style={{ fontSize: "7.5px", letterSpacing: "0.14em", color: "var(--accent)" }}
           >
             {style.tag}
           </span>
@@ -115,10 +99,10 @@ export default function BrandCard({
             }}
           >
             <span
-              className="inline-block px-2.5 py-0.5 rounded-full font-bold uppercase"
+              className="tag-brutal"
               style={{
                 fontSize: "7px", letterSpacing: "0.12em",
-                background: "#7A9E74", color: "#ffffff", whiteSpace: "nowrap",
+                background: "var(--accent)", color: "var(--surface)", whiteSpace: "nowrap",
               }}
             >
               Show results →

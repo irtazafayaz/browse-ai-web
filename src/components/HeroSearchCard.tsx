@@ -52,30 +52,25 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
 
   return (
     <div
-      className="rounded-3xl p-7 transition-all duration-300"
+      className="p-7 shadow-brutal-lg"
       style={{
-        background: "#EEE9E0",
-        border: focused
-          ? "1.5px solid rgba(122,158,116,0.60)"
-          : "1.5px solid rgba(0,0,0,0.07)",
-        boxShadow: focused
-          ? "0 0 0 4px rgba(122,158,116,0.12), 0 24px 48px rgba(0,0,0,0.09)"
-          : "0 2px 20px rgba(0,0,0,0.06)",
+        background: "var(--bg)",
+        border: "3px solid var(--ink)",
       }}
     >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Sparkles size={12} style={{ color: "#7A9E74" }} />
+          <Sparkles size={12} style={{ color: "var(--accent)" }} />
           <span
             className="text-[9px] font-black tracking-[0.24em] uppercase"
-            style={{ color: "#58574F" }}
+            style={{ color: "var(--ink-muted)" }}
           >
             Describe your style
           </span>
         </div>
         <div className="relative">
           <div
-            className="flex rounded-full p-[3px]"
+            className="flex p-[3px] border-brutal-thin"
             style={{ background: "rgba(0,0,0,0.07)" }}
           >
             {(["Women", "Men"] as const).map((g) => (
@@ -83,11 +78,10 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
                 key={g}
                 type="button"
                 onClick={() => g === "Men" ? showComingSoon() : undefined}
-                className="px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-200"
+                className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider transition-all duration-150"
                 style={{
-                  background: g === "Women" ? "#0F0F0E" : "transparent",
-                  color: g === "Women" ? "white" : "#9B9B9B",
-                  boxShadow: g === "Women" ? "0 2px 6px rgba(0,0,0,0.22)" : "none",
+                  background: g === "Women" ? "var(--ink)" : "transparent",
+                  color: g === "Women" ? "var(--surface)" : "var(--ink-muted)",
                 }}
               >
                 {g}
@@ -101,10 +95,11 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                className="absolute right-0 top-full mt-2 flex items-center gap-2 px-3.5 py-2 rounded-xl text-white text-[11px] font-bold"
+                className="absolute right-0 top-full mt-2 flex items-center gap-2 px-3.5 py-2 text-white text-[11px] font-bold"
                 style={{
-                  background: "#0F0F0E",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.22)",
+                  background: "var(--ink)",
+                  border: "2px solid var(--ink)",
+                  boxShadow: "4px 4px 0 var(--ink)",
                   whiteSpace: "nowrap",
                   zIndex: 10,
                 }}
@@ -122,7 +117,7 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
           <span
             className="absolute top-0 left-0 text-sm leading-relaxed italic pointer-events-none"
             style={{
-              color: "#BBBBBB",
+              color: "var(--ink-muted)",
               opacity: phVisible ? 1 : 0,
               transform: phVisible ? "translateY(0)" : "translateY(-5px)",
               transition: "opacity 0.28s ease, transform 0.28s ease",
@@ -145,7 +140,7 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
             }
           }}
           className="w-full bg-transparent outline-none resize-none text-sm leading-relaxed"
-          style={{ color: "#0F0F0E", caretColor: "#7A9E74" }}
+          style={{ color: "var(--ink)", caretColor: "var(--accent)" }}
         />
       </div>
 
@@ -157,8 +152,8 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
             key={tag}
             type="button"
             onClick={() => addTag(tag)}
-            className="text-[9.5px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all duration-200 hover:bg-[#7A9E74] hover:text-white active:scale-95"
-            style={{ background: "rgba(0,0,0,0.055)", color: "#555555" }}
+            className="text-[9.5px] font-black uppercase tracking-widest px-3 py-1 border-brutal-thin transition-all duration-150 hover:bg-[var(--accent)] hover:text-[var(--surface)] active:scale-95"
+            style={{ background: "rgba(0,0,0,0.055)", color: "var(--ink-muted)" }}
           >
             {tag}
           </button>
@@ -175,16 +170,17 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
           overflow: "hidden",
           width: "100%",
           height: "48px",
-          borderRadius: "16px",
-          fontWeight: 900,
+          fontFamily: "var(--font-space-mono), monospace",
+          fontWeight: 700,
           fontSize: "11px",
           textTransform: "uppercase",
           letterSpacing: "0.12em",
-          background: hasValue ? "#0F0F0E" : "rgba(0,0,0,0.07)",
-          color: hasValue ? "white" : "#AAAAAA",
-          boxShadow: hasValue ? "0 8px 24px rgba(0,0,0,0.22)" : "none",
-          transition: "background 0.25s, box-shadow 0.25s",
-          border: "none",
+          background: hasValue ? "var(--pop)" : "rgba(0,0,0,0.07)",
+          color: hasValue ? "var(--ink)" : "var(--ink-muted)",
+          border: "3px solid var(--ink)",
+          boxShadow: hasValue ? (btnHovered ? "6px 6px 0 var(--ink)" : "4px 4px 0 var(--ink)") : "none",
+          transform: hasValue && btnHovered ? "translate(-2px, -2px)" : "translate(0, 0)",
+          transition: "background 0.15s ease-out, box-shadow 0.15s ease-out, transform 0.15s ease-out",
           cursor: "pointer",
         }}
       >
@@ -192,9 +188,9 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
           transform: btnHovered ? "translateY(-100%)" : "translateY(0)",
-          transition: "transform 0.6s cubic-bezier(0.165,0.84,0.44,1)",
+          transition: "transform 0.15s ease-out",
         }}>
-          <Sparkles size={12} style={{ color: hasValue ? "#7A9E74" : "#CCCCCC" }} />
+          <Sparkles size={12} style={{ color: hasValue ? "var(--accent)" : "var(--ink-muted)" }} />
           Find my style
           <ArrowRight size={12} style={{ opacity: hasValue ? 1 : 0.4 }} />
         </span>
@@ -202,9 +198,9 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
           transform: btnHovered ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 0.6s cubic-bezier(0.165,0.84,0.44,1)",
+          transition: "transform 0.15s ease-out",
         }}>
-          <Sparkles size={12} style={{ color: "#7A9E74" }} />
+          <Sparkles size={12} style={{ color: "var(--accent)" }} />
           Find my style
           <ArrowRight size={12} />
         </span>

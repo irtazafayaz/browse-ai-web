@@ -18,19 +18,12 @@ export const BRAND_LIST = [
 function BrandPill({ name, dark }: { name: string; dark: boolean }) {
   return (
     <span
-      className={`inline-flex items-center gap-3 font-bold text-sm tracking-widest uppercase mx-8 transition-opacity duration-300 ${
-        dark ? 'text-[#555555] hover:text-[#CCCCCC]' : 'text-[#8B8B8B] hover:text-[#1A1A1A]'
+      className={`font-mono-brutal inline-flex items-center gap-3 font-bold text-sm tracking-widest uppercase mx-8 transition-opacity duration-150 ${
+        dark ? 'text-[var(--ink-muted)] opacity-70 hover:opacity-100' : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
       }`}
     >
       {/* Initials badge */}
-      <span
-        className="w-5 h-5 rounded-full flex items-center justify-center text-[7px] font-black shrink-0"
-        style={{
-          background: dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)',
-          color: dark ? '#888' : '#666',
-          letterSpacing: 0,
-        }}
-      >
+      <span className="tag-brutal shrink-0">
         {name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
       </span>
 
@@ -44,9 +37,13 @@ function BrandPill({ name, dark }: { name: string; dark: boolean }) {
 
 export default function MarqueeBrands({ dark = false }: { dark?: boolean }) {
   const doubled = [...BRAND_LIST, ...BRAND_LIST];
+  const borderColor = dark ? 'var(--surface)' : 'var(--ink)';
   return (
-    <div className="overflow-hidden w-full">
-      <div className="flex animate-marquee whitespace-nowrap" style={{ width: 'max-content' }}>
+    <div
+      className="overflow-hidden w-full"
+      style={{ borderTop: `3px solid ${borderColor}`, borderBottom: `3px solid ${borderColor}` }}
+    >
+      <div className="flex animate-marquee whitespace-nowrap py-2" style={{ width: 'max-content' }}>
         {doubled.map((brand, i) => (
           <BrandPill key={i} name={brand.name} dark={dark} />
         ))}
