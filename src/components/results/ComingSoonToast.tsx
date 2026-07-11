@@ -1,7 +1,13 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ComingSoonToast({ visible }: { visible: boolean }) {
+export default function ComingSoonToast({
+  visible,
+  message = "Coming soon",
+}: {
+  visible: boolean;
+  message?: string;
+}) {
   return (
     <AnimatePresence>
       {visible && (
@@ -18,7 +24,7 @@ export default function ComingSoonToast({ visible }: { visible: boolean }) {
           }}
         >
           <span style={{ fontSize: 15 }}>🚀</span>
-          Coming soon
+          {message}
         </motion.div>
       )}
     </AnimatePresence>
