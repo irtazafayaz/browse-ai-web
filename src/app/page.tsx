@@ -19,6 +19,7 @@ import HeroSearchCard from "@/components/HeroSearchCard";
 import BrandCard from "@/components/BrandCard";
 import { useScrollReveal } from "@/lib/hooks/useScrollReveal";
 import { getEdits } from "@/lib/api";
+import { setPendingImageSearch } from "@/lib/pendingImageSearch";
 import { Edit } from "@/lib/types";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -76,6 +77,10 @@ export default function LandingPage() {
 
   const handleSearch = (text: string) =>
     router.push(`/results?q=${encodeURIComponent(text)}`);
+  const handleImageSelected = (file: File) => {
+    setPendingImageSearch(file);
+    router.push("/results?img=1");
+  };
   const handleEditTap = (edit: Edit) =>
     router.push(`/results?q=${encodeURIComponent(edit.label)}`);
 
@@ -268,7 +273,7 @@ export default function LandingPage() {
             }}
           >
             <CardTilt>
-              <HeroSearchCard onSubmit={handleSearch} />
+              <HeroSearchCard onSubmit={handleSearch} onImageSelected={handleImageSelected} />
             </CardTilt>
           </div>
         </div>

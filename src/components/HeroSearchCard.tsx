@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Camera } from "lucide-react";
+import { validateImageFile } from "@/lib/pendingImageSearch";
 import { motion, AnimatePresence } from "framer-motion";
 
 const QUICK_TAGS = ["Lawn", "Chiffon", "Embroidered", "Casual", "Formal", "Pret"];
@@ -13,7 +14,13 @@ const HERO_PLACEHOLDERS = [
   "stitched pret kurta for everyday wear…",
 ];
 
-export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => void }) {
+export default function HeroSearchCard({
+  onSubmit,
+  onImageSelected,
+}: {
+  onSubmit: (q: string) => void;
+  onImageSelected?: (file: File) => void;
+}) {
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
   const [phIdx, setPhIdx] = useState(0);
@@ -21,6 +28,7 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
   const [btnHovered, setBtnHovered] = useState(false);
   const [comingSoon, setComingSoon] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const t = setInterval(async () => {
@@ -33,9 +41,22 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
     return () => clearInterval(t);
   }, [focused, value]);
 
-  const showComingSoon = () => {
+  const [toastText, setToastText] = useState("Men's collection coming soon");
+  const flashToast = (text: string) => {
+    setToastText(text);
     setComingSoon(true);
     setTimeout(() => setComingSoon(false), 2200);
+  };
+  const onHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const err = validateImageFile(file);
+    if (err) {
+      flashToast(err);
+      return;
+    }
+    onImageSelected?.(file);
   };
 
   const submit = () => {
@@ -77,7 +98,7 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
               <button
                 key={g}
                 type="button"
-                onClick={() => g === "Men" ? showComingSoon() : undefined}
+                onClick={() => g === "Men" ? flashToast("Men's collection coming soon") : undefined}
                 className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider transition-all duration-150"
                 style={{
                   background: g === "Women" ? "var(--ink)" : "transparent",
@@ -105,7 +126,7 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
                 }}
               >
                 <span style={{ fontSize: 13 }}>🚀</span>
-                Men&apos;s collection coming soon
+                {toastText}
               </motion.div>
             )}
           </AnimatePresence>
@@ -204,6 +225,22 @@ export default function HeroSearchCard({ onSubmit }: { onSubmit: (q: string) => 
           Find my style
           <ArrowRight size={12} />
         </span>
+      </button>
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={onHeroImageChange}
+      />
+      <button
+        type="button"
+        onClick={() => imageInputRef.current?.click()}
+        className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 border-brutal-thin text-[10px] font-black uppercase tracking-widest transition-all duration-150 ease-out hover:bg-[var(--accent-soft)] active:scale-[0.99]"
+        style={{ background: "var(--surface)", color: "var(--ink)" }}
+      >
+        <Camera size={13} style={{ color: "var(--accent)" }} />
+        Search with a photo
       </button>
     </div>
   );

@@ -14,7 +14,7 @@ import FilterBar from "@/components/results/FilterBar";
 import ActiveFilterChips from "@/components/results/ActiveFilterChips";
 import { Product, SearchFilters } from "@/lib/types";
 import { searchProducts, searchByImage, toggleBookmark } from "@/lib/api";
-import { validateImageFile } from "@/lib/pendingImageSearch";
+import { validateImageFile, consumePendingImageSearch } from "@/lib/pendingImageSearch";
 import { useAuth } from "@/lib/AuthContext";
 
 type SortMode = "match" | "price-asc" | "price-desc" | "trending";
@@ -241,7 +241,15 @@ function ResultsContent() {
   useEffect(() => {
     if (mountedRef.current) return;
     mountedRef.current = true;
-    if (initialQuery) fetchText(initialQuery, {}, 1, true);
+    if (searchParams.get("img") === "1") {
+      const pending = consumePendingImageSearch();
+      if (pending) {
+        runImageSearch(pending);
+        router.replace("/results", { scroll: false });
+      }
+    } else if (initialQuery) {
+      fetchText(initialQuery, {}, 1, true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
